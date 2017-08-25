@@ -31,6 +31,8 @@ class Trace():
         self.trace()
         if self.first_ex is not None:
             raise self.first_ex
+        else:
+            print("No exception to raise")
 
     def _str(self, err, i):
         msg = err["msg"]
@@ -44,7 +46,8 @@ class Trace():
         err["msg"] = msg
         err["isfrom"] = isfrom
         err["error"] = traceback.format_exc()
-        if len(self.errs) == 0:
+        print("NEW", ex, self.first_ex)
+        if ex is not None and self.first_ex is None:
             self.first_ex = ex
         return err
 
