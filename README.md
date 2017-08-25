@@ -14,7 +14,7 @@ Print the errors that occured:
       try:
          c = 1 + "1"
       except Exception as e:
-         err = error.new("Error in f1", "f1", e)
+         err = error.new("Error in f1", "f1")
          return err
       return None
     
