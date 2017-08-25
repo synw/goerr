@@ -13,7 +13,7 @@ Print the errors that occured:
       err = f2()
       try:
          c = 1 + "1"
-      except Exception as e:
+      except:
          err = error.new("Error in f1", "f1")
          return err
       return None
