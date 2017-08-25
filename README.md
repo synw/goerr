@@ -56,4 +56,4 @@ Example: `error.new("An error has occured", "function_name", exception_object)`
 
 **`throw`**: prints the errors trace and raise the first exception that was passed to the trace. Example: `err.throw()`
 
-**`get`**: get a json object represents the errors trace. Example: `err.get()`
+**`get`**: get a json object that represents the errors trace. Example: `err.get()`
