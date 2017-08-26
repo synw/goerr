@@ -45,7 +45,7 @@ class Trace():
         errs = []
         for err in self.errs:
             err.pop("ex")
-            err["date"] = err["date"].strftime('%s')
+            err["date"] = int(err["date"].strftime('%s'))
             errs.append(err)
         return json.dumps(errs, indent=indent)
 
