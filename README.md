@@ -56,7 +56,7 @@ Methods:
 
 Either a message string or an exception has to be provided as argument.
 
-Example: `error.new("An error has occured", exception_object)`
+Example: `err.new("An error has occured", exception_object)`
 
 **`trace`**: prints the errors trace. Example: see the code above
 
