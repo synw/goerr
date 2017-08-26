@@ -52,7 +52,7 @@ Methods:
 
 - `ex`: the first exception that was raised in the stack (optional)
 - `msg`: the message string (optional)
-- `isfrom`: the name of the function that raised the error (optional) 
+- `function`: the function object that raised the error (optional: usefull only when no exception is provided) 
 
 Either a message string or an exception has to be provided as argument.
 
