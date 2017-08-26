@@ -11,7 +11,7 @@ Go style explicit error handling in Python. Propagates errors up the call stack 
 Print the errors trace:
 
    ```python
-   from goerr import error
+   from goerr import err
    
    def function1():
       function2()
