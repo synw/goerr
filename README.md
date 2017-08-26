@@ -19,7 +19,6 @@ Print the errors trace:
          1 + "1"
       except Exception as e:
          err.new("error message with exception in first function", e)
-      return None
     
    def function2():
       function3()
@@ -30,7 +29,6 @@ Print the errors trace:
          {} > 1
       except Exception as e:
          err.new(e)
-      return None
       
    def main():
       function1()
