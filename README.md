@@ -1,39 +1,41 @@
 # Goerr
 
-Go style error handling in Python. Propagates errors up the stack in the same style as Go.
+Go style explicit error handling in Python. Propagates errors up the stack in the same style as Go.
 
 ## Example
 
-Print the errors that occured:
+Print the errors trace:
 
    ```python
    from goerr import error
    
-   def f1():
-      err = f2()
+   def function1():
+      function2()
       try:
-         c = 1 + "1"
-      except:
-         err = error.new("Error in f1", "f1")
-         return err
+         1 + "1"
+      except Exception as e:
+         err.new("error message with exception in first function", e)
       return None
     
-   def f2():
+   def function2():
+      function3()
+      err.new("error message in second function", function2)
+      
+   def function3():
       try:
-         a = [1]
-         c = a[1]
+         {} > 1
       except Exception as e:
-         err = error.new("Error in f2", "f2", e)
-         return err
-    return None
-    
+         err.new(e)
+      return None
+      
    def main():
-      err = f1()
-      if err is not None:
+      function1()
+      if err.exists is True:
          err.trace()
-    
-   if __name__ == "__main__":
-      main()
+         print("------------------")
+         print("Json error object:")
+         print("------------------")
+         print(err.to_json(indent=2))
    ```
 
 Output:
@@ -46,9 +48,11 @@ Methods:
 
 **`new`**: creates a new error and store it in the trace: parameters: 
 
-- `msg`: the message string
-- `isfrom`: the name of the function that raised the error (optional) 
 - `ex`: the first exception that was raised in the stack (optional)
+- `msg`: the message string (optional)
+- `isfrom`: the name of the function that raised the error (optional) 
+
+Either a message string or an exception has to be provided as argument.
 
 Example: `error.new("An error has occured", "function_name", exception_object)`
 
@@ -56,4 +60,10 @@ Example: `error.new("An error has occured", "function_name", exception_object)`
 
 **`throw`**: prints the errors trace and raise the first exception that was passed to the trace. Example: `err.throw()`
 
-**`get`**: get a json object that represents the errors trace. Example: `err.get()`
+**`to_json`**: get a json object that represents the errors trace. Params: `indent`.Example: `err.to_json(indent=2)`.
+
+**`to_dict`**: get a dictionnary object that represents the errors trace. Example: `err.to_dict()`.
+
+Properties:
+
+**`exists`**: check if there are some errors in the trace

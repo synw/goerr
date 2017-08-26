@@ -1,6 +1,10 @@
 from __future__ import print_function
 import traceback
-from goerr.colors import cols
+import sys
+from _ast import arg
+import json
+from datetime import datetime
+from .colors import cols
 
 
 class Trace():
@@ -12,21 +16,23 @@ class Trace():
             str(len(self.errs)) + " errors>"
         return msg
 
-    def new(self, msg, isfrom=None, ex=None):
-        err = self._new(msg, isfrom, ex)
+    @property
+    def exists(self):
+        if len(self.errs) > 0:
+            return True
+        return False
+
+    def new(self, *args):
+        err = self._new(args)
         self.errs.append(err)
         return self
 
-    def get(self):
-        return self.errs
-
     def trace(self):
-        i = 0
+        i = len(self.errs) - 1
         for err in self.errs:
             print(self._str(err, i))
-            if err["error"] is not None:
-                print(err["error"])
-            i += 1
+            print(err["error"])
+            i -= 1
 
     def throw(self):
         self.trace()
@@ -35,22 +41,86 @@ class Trace():
         else:
             print("No exception to raise")
 
+    def to_json(self, indent=None):
+        errs = []
+        for err in self.errs:
+            err.pop("ex")
+            err["date"] = err["date"].strftime('%s')
+            errs.append(err)
+        return json.dumps(errs, indent=indent)
+
+    def to_dict(self):
+        return self.errs
+
     def _str(self, err, i):
         msg = err["msg"]
-        if err["isfrom"] is not None:
-            msg = cols.FAIL + "Error " + str(i) + cols.ENDC + " from " + cols.BOLD + \
-                err["isfrom"] + cols.ENDC + " : " + msg
+        funcstr = ""
+        if err["function"] is not None:
+            funcstr = " from " + cols.BOLD + err["function"] + cols.ENDC
+        msg = cols.FAIL + "Error " + \
+            str(i) + cols.ENDC + funcstr + " : " + msg
         return msg
 
-    def _new(self, msg, isfrom=None, ex=None):
+    def _check_args(self, args):
+        """
+        Returns exception, message
+        """
+        exc = None
+        msg = None
+        funcname = None
+        for arg in args:
+            if isinstance(arg, str):
+                msg = arg
+            elif isinstance(arg, Exception):
+                exc = arg
+            elif callable(arg):
+                funcname = arg.__name__
+        return exc, msg, funcname
+
+    def _err(self, msg):
+        print(msg)
+
+    def _new(self, *args):
+        num_args = len(args[0])
+        if num_args == 0:
+            self._err(
+                "Goerr error: either a 'str' or an 'Exception' object are required to create an 'err' object")
+            # TODO : handle internal error
+            raise
+        msg = None
+        ex = None
+        # verify types and get values from args
+        for uargs in args:
+            ex, msg, funcname = self._check_args(uargs)
+        # verify values
+        if ex is None and msg is None:
+            self._err(
+                "Goerr error: either a 'str' or 'Exception' type must be passed to 'err' constructor")
+            # TODO : handle internal error
+            raise
+        # handle exception
+        _err = ""
+        if ex is not None:
+            # first exception storage
+            if self.first_ex is None:
+                self.first_ex = ex
+            # get info from exception
+            _, _, exc_tb = sys.exc_info()
+            _, _, func_name, _ = traceback.extract_tb(exc_tb)[-1]
+            # set values
+            funcname = func_name
+            _err = traceback.format_exc()
+        # ensure that msg is str type
+        if msg is None:
+            msg = ""
+        # init err object
         err = {}
+        err["function"] = funcname
+        err["error"] = _err
         err["msg"] = msg
-        err["isfrom"] = isfrom
-        err["error"] = traceback.format_exc()
-        print("NEW", ex, self.first_ex)
-        if ex is not None and self.first_ex is None:
-            self.first_ex = ex
+        err["ex"] = ex
+        err["date"] = datetime.now()
         return err
 
 
-error = Trace()
+err = Trace()
