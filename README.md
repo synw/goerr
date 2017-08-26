@@ -50,7 +50,7 @@ Methods:
 
 **`new`**: creates a new error and store it in the trace: parameters: 
 
-- `ex`: the first exception that was raised in the stack (optional)
+- `ex`: an exception (optional)
 - `msg`: the message string (optional)
 - `function`: the function object that raised the error (optional: usefull only when no exception is provided) 
 
