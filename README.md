@@ -1,6 +1,6 @@
 # Goerr
 
-Go style explicit error handling in Python. Propagates errors up the stack in the same style as Go.
+Go style explicit error handling in Python. Propagates errors up the call stack in the same style as Go.
 
 ## Example
 
