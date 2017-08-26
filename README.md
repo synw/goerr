@@ -2,7 +2,11 @@
 
 Go style explicit error handling in Python. Propagates errors up the call stack in the same style as Go.
 
-## Example
+   ```bash
+   pip install goerr
+   ```
+
+## Usage
 
 Print the errors trace:
 
