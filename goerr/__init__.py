@@ -27,6 +27,15 @@ class Trace():
         self.errs.append(err)
         return self
 
+    def check(self):
+        if self.exists:
+            self.trace()
+            self.errs = []
+
+    def fatal(self):
+        if self.exists:
+            self.throw()
+
     def trace(self):
         i = len(self.errs) - 1
         for err in self.errs:
