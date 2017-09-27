@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import print_function
 import traceback
 import sys
@@ -5,6 +7,17 @@ from _ast import arg
 import json
 from datetime import datetime
 from .colors import cols
+DJANGO = False
+try:
+    from django.core.mail import send_mail
+    from django.conf import settings
+    try:
+        ADMINS = settings.ADMINS
+        DJANGO = True
+    except:
+        pass
+except:
+    pass
 
 
 class Trace():
@@ -49,6 +62,21 @@ class Trace():
             raise self.first_ex
         else:
             print("No exception to raise")
+
+    def report(self):
+        global DJANGO, ADMINS
+        mails = []
+        if DJANGO is True:
+            for admin in ADMINS:
+                mails.append(admin[1])
+            content = ""
+            i = 0
+            for err in self.errs:
+                content = content + self._str(err, i)
+                i += 1
+            send_mail("Error", content, "goerr@site.com", mails)
+        else:
+            self.trace()
 
     def to_json(self, indent=None):
         errs = []
