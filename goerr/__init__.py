@@ -76,7 +76,7 @@ class Trace():
                 i += 1
             send_mail("Error", content, "goerr@site.com", mails)
         else:
-            self.trace()
+            self.throw()
 
     def to_json(self, indent=None):
         errs = []

@@ -63,7 +63,7 @@ Example: `err.new("An error has occured", exception_object)`
 **`throw`**: prints the errors trace and raise the first exception that was passed to the trace. Example: `err.throw()`
 
 **`report`**: if Django is installed this will send an email to the admins declared in settings. Otherwise it will
-behave like `trace()`
+behave like `throw()`
 
 **`to_json`**: get a json object that represents the errors trace. Params: `indent`.Example: `err.to_json(indent=2)`.
 
