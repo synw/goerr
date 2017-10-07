@@ -43,7 +43,6 @@ class Trace():
     def check(self):
         if self.exists:
             self.trace()
-            self.errs = []
 
     def fatal(self):
         if self.exists:
@@ -55,6 +54,7 @@ class Trace():
             print(self._str(err, i))
             print(err["error"])
             i -= 1
+        self.reset()
 
     def throw(self):
         self.trace()
@@ -77,6 +77,10 @@ class Trace():
             send_mail("Error", content, "goerr@site.com", mails)
         else:
             self.throw()
+
+    def reset(self):
+        self.errs = []
+        self.first_ex = None
 
     def to_json(self, indent=None):
         errs = []
