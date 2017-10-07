@@ -65,9 +65,9 @@ Example: `err.new("An error has occured", exception_object)`
 **`report`**: if Django is installed this will send an email to the admins declared in settings. Otherwise it will
 behave like `throw()`
 
-**check**: check if error exists and run `trace()` if it does
+**`check`**: check if error exists and run `trace()` if it does
 
-**fatal**: check if error exists and run `throw()` if it does
+**`fatal`**: check if error exists and run `throw()` if it does
 
 **`to_json`**: get a json object that represents the errors trace. Params: `indent`.Example: `err.to_json(indent=2)`.
 
