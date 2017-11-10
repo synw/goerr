@@ -50,7 +50,7 @@ class Trace():
 
     def trace(self):
         i = len(self.errs) - 1
-        for err in self.errs:
+        for err in self.errs[::-1]:
             print(self._str(err, i))
             print(err["error"])
             i -= 1
