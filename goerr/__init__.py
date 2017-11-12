@@ -6,7 +6,7 @@ import sys
 from _ast import arg
 import json
 from datetime import datetime
-from .colors import cols
+from .colors import colors
 DJANGO = False
 try:
     from django.core.mail import send_mail
@@ -104,9 +104,8 @@ class Trace():
         msg = err["msg"]
         funcstr = ""
         if err["function"] is not None:
-            funcstr = " from " + cols.BOLD + err["function"] + cols.ENDC
-        msg = cols.FAIL + "Error " + \
-            str(i) + cols.ENDC + funcstr + " : " + msg
+            funcstr = "from " + colors.bold(err["function"])
+        msg = colors.red("Error " + str(i)) + funcstr + " : " + msg
         return msg
 
     def _check_args(self, args):
