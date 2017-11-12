@@ -35,6 +35,10 @@ class Trace():
             return True
         return False
 
+    @property
+    def num(self):
+        return len(self.errs)
+
     def new(self, *args):
         err = self._new(args)
         self.errs.append(err)
@@ -48,16 +52,19 @@ class Trace():
         if self.exists:
             self.throw()
 
-    def trace(self):
+    def trace(self, reverse=False):
+        errs = self.errs
+        if reverse is True:
+            errs = errs[::-1]
         i = len(self.errs) - 1
-        for err in self.errs[::-1]:
+        for err in errs:
             print(self._str(err, i))
             print(err["error"])
             i -= 1
         self.reset()
 
-    def throw(self):
-        self.trace()
+    def throw(self, reverse=False):
+        self.trace(reverse)
         if self.first_ex is not None:
             raise self.first_ex
         else:
@@ -154,6 +161,8 @@ class Trace():
         # ensure that msg is str type
         if msg is None:
             msg = ""
+        line = cols.BOLD + "line" + cols.ENDC
+        _err = _err.replace("line", line)
         # init err object
         err = {}
         err["function"] = funcname
