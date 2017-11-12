@@ -160,7 +160,7 @@ class Trace():
         # ensure that msg is str type
         if msg is None:
             msg = ""
-        line = cols.BOLD + "line" + cols.ENDC
+        line = colors.bold("line")
         _err = _err.replace("line", line)
         # init err object
         err = {}
