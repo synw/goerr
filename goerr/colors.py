@@ -35,7 +35,7 @@ class Colors:
         res = []
         for m in msg:
             res.append(str(m))
-        txt = " ".join(msg)
+        txt = " ".join(res)
         col = color + txt + "\033[0m"
         return col
 
