@@ -105,7 +105,7 @@ class Trace():
         funcstr = ""
         if err["function"] is not None:
             funcstr = "from " + colors.bold(err["function"])
-        msg = colors.red("Error " + str(i)) + funcstr + " : " + msg
+        msg = colors.red("Error " + str(i)) + " " + funcstr + " : " + msg
         return msg
 
     def _check_args(self, args):
