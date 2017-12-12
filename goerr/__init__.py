@@ -67,8 +67,6 @@ class Trace():
         self.trace(reverse)
         if self.first_ex is not None:
             raise self.first_ex
-        else:
-            print("No exception to raise")
 
     def report(self):
         global DJANGO, ADMINS
