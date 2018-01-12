@@ -33,11 +33,12 @@ Print the errors trace:
    def main():
       function1()
       if err.exists is True:
+         json_err = err.to_json(indent=2)
          err.trace()
          print("------------------")
          print("Json error object:")
          print("------------------")
-         print(err.to_json(indent=2))
+         print(json_err)
    ```
 
 Output:
