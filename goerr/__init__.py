@@ -14,9 +14,9 @@ try:
     try:
         ADMINS = settings.ADMINS
         DJANGO = True
-    except:
+    except Exception:
         pass
-except:
+except Exception:
     pass
 
 
@@ -89,10 +89,11 @@ class Trace():
 
     def to_json(self, indent=None):
         errs = []
-        for err in self.errs:
-            err.pop("ex")
-            err["date"] = int(err["date"].strftime('%s'))
-            errs.append(err)
+        for error in self.errs:
+            newerr = error.copy()
+            newerr["ex"] = str(newerr["ex"])
+            newerr["date"] = newerr["date"].strftime('%Y-%m-%d %H:%M:%S')
+            errs.append(newerr)
         return json.dumps(errs, indent=indent)
 
     def to_dict(self):
@@ -129,7 +130,7 @@ class Trace():
         num_args = len(args[0])
         if num_args == 0:
             self._err(
-                "Goerr error: either a 'str' or an 'Exception' object are required to create an 'err' object")
+                "Goerr error: either a string or an Exception object are required to create an err object")
             # TODO : handle internal error
             raise
         msg = None
@@ -151,9 +152,9 @@ class Trace():
                 self.first_ex = ex
             # get info from exception
             _, _, exc_tb = sys.exc_info()
-            _, _, func_name, _ = traceback.extract_tb(exc_tb)[-1]
+            if funcname is not None:
+                _, _, funcname, _ = traceback.extract_tb(exc_tb)[-1]
             # set values
-            funcname = func_name
             _err = traceback.format_exc()
         # ensure that msg is str type
         if msg is None:
