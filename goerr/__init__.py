@@ -90,11 +90,14 @@ class Trace():
         for error in self.errs:
             newerr = error.copy()
             newerr["ex"] = str(newerr["ex"])
-            newerr["date"] = newerr["date"].strftime('%Y-%m-%d %H:%M:%S')
+            newerr["date"] = self.format_date(newerr["date"])
             errs.append(newerr)
         if reset is True:
             self.reset()
         return json.dumps(errs, indent=indent)
+
+    def format_date(self, date):
+        return date.strftime('%Y-%m-%d %H:%M:%S')
 
     def to_html(self, reset=False, reverse=False):
         msg = ""
