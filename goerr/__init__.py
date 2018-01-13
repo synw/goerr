@@ -118,7 +118,7 @@ class Trace():
             if errmsg:
                 if func:
                     msg = msg + " from function <b>" + func + "</b>"
-                msg += ' ' + date + "x"
+                msg += ' ' + date
             if ex != "None":
                 msg += "<em>" + ex + "</em>"
             if tb:
