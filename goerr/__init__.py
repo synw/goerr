@@ -85,14 +85,45 @@ class Trace():
         self.errs = []
         self.first_ex = None
 
-    def to_json(self, indent=None):
+    def to_json(self, indent=None, reset=False):
         errs = []
         for error in self.errs:
             newerr = error.copy()
             newerr["ex"] = str(newerr["ex"])
             newerr["date"] = newerr["date"].strftime('%Y-%m-%d %H:%M:%S')
             errs.append(newerr)
+        if reset is True:
+            self.reset()
         return json.dumps(errs, indent=indent)
+
+    def to_html(self, reset=False, reverse=False):
+        msg = ""
+        errs = self.errs
+        if reverse is True:
+            errs = reversed(self.errs)
+        for error in errs:
+            ex = str(error["ex"])
+            date = error["date"].strftime('%Y-%m-%d %H:%M:%S')
+            errmsg = error["msg"]
+            func = error["function"]
+            tb = error["error"]
+            tb = tb.replace("[0m", "")
+            tb = tb.replace("[1m", "")
+            tb = tb.replace(" line ", " <b>line</b> ")
+            tb = tb.replace("\n", "<br />")
+            msg += '<p class="error"><em>' + errmsg + '</em>'
+            if errmsg:
+                if func:
+                    msg = msg + " from function <b>" + func + "</b>"
+                msg += ' ' + date + "x"
+            if ex != "None":
+                msg += "<em>" + ex + "</em>"
+            if tb:
+                msg += '</p><p>' + tb
+            msg += "</p>"
+        if reset is True:
+            self.reset()
+        return msg
 
     def to_dict(self):
         return self.errs
@@ -157,8 +188,8 @@ class Trace():
         # ensure that msg is str type
         if msg is None:
             msg = ""
-        line = colors.bold("line")
-        _err = _err.replace("line", line)
+        line = colors.bold(" line ")
+        _err = _err.replace(" line ", line)
         # init err object
         err = {}
         err["function"] = funcname
