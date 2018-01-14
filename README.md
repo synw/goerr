@@ -72,6 +72,8 @@ behave like `throw()`
 
 **`to_json`**: get a json object that represents the errors trace. Params: `indent`.Example: `err.to_json(indent=2)`.
 
+**`to_html`**: outputs the trace as html
+
 **`to_dict`**: get a dictionnary object that represents the errors trace. Example: `err.to_dict()`.
 
 Properties:
