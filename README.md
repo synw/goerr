@@ -47,7 +47,7 @@ Output:
 
 ## API
 
-Methods:
+### Methods:
 
 **`new`**: creates a new error and store it in the trace: parameters: 
 
@@ -76,6 +76,19 @@ behave like `throw()`
 
 **`to_dict`**: get a dictionnary object that represents the errors trace. Example: `err.to_dict()`.
 
-Properties:
+### Properties:
 
-**`exists`**: check if there are some errors in the trace
+**`exists`**: check if there are some errors in the trace. Ex:
+
+   ```python
+   if err.exists is True:
+      err.throw()
+   ```
+
+## Why?
+
+I like the explicit errors management in Go (unlike many people) and I wanted to have the
+same kind of experience in Python: a fined grained control over errors all across the call
+stack, plus the ability to export them in various formats.
+
+The same lib in Go: [terr](https://github.com/synw/terr)
