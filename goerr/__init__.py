@@ -131,6 +131,11 @@ class Trace():
     def to_dict(self):
         return self.errs
 
+    def msg(self, msg):
+        tr = self.new(msg)
+        print(self._str(tr.errs[0], 0))
+        self.errs = []
+
     def _str(self, err, i):
         msg = err["msg"]
         funcstr = ""
