@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 
 
-version = "0.7.4"
+version = "0.8"
 
 setup(
     name='goerr',
     packages=find_packages(),
     version=version,
-    description='Go style explicit errors handling in Python',
+    description='Go style explicit errors handling',
     author='synw',
     author_email='synwe@yahoo.com',
     url='https://github.com/synw/goerr',
