@@ -6,89 +6,79 @@ Go style explicit error handling in Python. Propagates errors up the call stack 
    pip install goerr
    ```
 
-## Usage
-
-Print the errors trace:
+## Quick example
 
    ```python
-   from goerr import err
-   
-   def function1():
-      function2()
-      try:
-         1 + "1"
-      except Exception as e:
-         err.new("error message with exception in first function", e)
+    from goerr import Trace
     
-   def function2():
-      function3()
-      err.new("error message in second function", function2)
-      
-   def function3():
-      try:
-         {} > 1
-      except Exception as e:
-         err.new(e)
-      
-   def main():
-      function1()
-      if err.exists is True:
-         json_err = err.to_json(indent=2)
-         err.trace()
-         print("------------------")
-         print("Json error object:")
-         print("------------------")
-         print(json_err)
+    
+    class TestErr(Trace):
+
+       def func1(self):
+          msg("Function 1 running")
+          self.output("function 1")
+          try:
+             "a" > 1
+          except Exception as e:
+             self.err(e)
+
+       def func2(self):
+          msg("Function 2 running")
+          self.output("function 2")
+          self.err("An error has occured")
+
+       def run(self):
+          self.func1()
+          self.func2()
+          self.stack()
+
+       def output(self, msg, i=3):
+          while i > 0:
+             print(msg)
+             i -= 1
+
+te = TestErr()
+te.run()
+msg("### Log msg:")
+log_msg = te.log()
+print(log_msg)
+msg("### Full trace:")
+te.check()
    ```
 
 Output:
 
-![Stack trace screenshot](https://raw.github.com/synw/goerr/master/docs/img/output.png)
+![Stack trace screenshot](docs/img/output.png)
 
 ## API
 
 ### Methods:
 
-**`new`**: creates a new error and store it in the trace: parameters: 
+**`err`**: creates a new error and store it in the trace: parameters: 
 
 - `ex`: an exception (optional)
 - `msg`: the message string (optional)
-- `function`: the function object that raised the error (optional: usefull only when no exception is provided) 
-
 Either a message string or an exception has to be provided as argument.
 
-Example: `err.new("An error has occured", exception_object)`
-
-**`trace`**: prints the errors trace. Example: see the code above
-
-**`throw`**: prints the errors trace and raise the first exception that was passed to the trace. Example: `err.throw()`
-
-**`report`**: if Django is installed this will send an email to the admins declared in settings. Otherwise it will
-behave like `throw()`
+**`trace`**: prints the errors trace
 
 **`check`**: check if error exists and run `trace()` if it does
 
-**`fatal`**: check if error exists and run `throw()` if it does
+**`fatal`**: check if error exists, run `trace()` if it does and raise an exception
 
-**`to_json`**: get a json object that represents the errors trace. Params: `indent`.Example: `err.to_json(indent=2)`.
+**`stack`**: add an error to the trace with no message if one previous error exists. Used
+to keep track of the call stack
 
-**`to_html`**: outputs the trace as html
-
-**`to_dict`**: get a dictionnary object that represents the errors trace. Example: `err.to_dict()`.
+**`log`**: returns a log message from the first error
 
 ### Properties:
 
-**`exists`**: check if there are some errors in the trace. Ex:
-
-   ```python
-   if err.exists is True:
-      err.throw()
-   ```
+**`exists`**: check if there are some errors in the trace. Returns `True` or `False`
 
 ## Why?
 
 I like the explicit errors management in Go (unlike many people) and I wanted to have the
 same kind of experience in Python: a fined grained control over errors all across the call
-stack, plus the ability to export them in various formats.
+stack.
 
 The same lib in Go: [terr](https://github.com/synw/terr)
