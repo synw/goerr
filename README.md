@@ -52,6 +52,15 @@ Output:
 
 ![Stack trace screenshot](docs/img/output.png)
 
+Or use in a functionnal style:
+
+   ```python
+   from goerr import tr
+   
+   
+   tr.err("Error message")
+   ```
+
 ## API
 
 ### Methods:

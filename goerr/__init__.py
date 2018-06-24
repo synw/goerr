@@ -263,4 +263,4 @@ class Trace():
         return ex, msg
 
 
-err = Trace()
+tr = Trace()
