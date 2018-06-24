@@ -11,41 +11,35 @@ Go style explicit error handling in Python. Propagates errors up the call stack 
 ## Quick example
 
    ```python
-    from goerr import Trace
-    
-    
-    class TestErr(Trace):
+import pandas as pd
+from goerr import Trace
 
-       def func1(self):
-          msg("Function 1 running")
-          self.output("function 1")
-          try:
-             "a" > 1
-          except Exception as e:
-             self.err(e)
 
-       def func2(self):
-          msg("Function 2 running")
-          self.output("function 2")
-          self.err("An error has occured")
+class TestRun(Trace):
 
-       def run(self):
-          self.func1()
-          self.func2()
-          self.stack()
+    def run0(self):
+        self.err("Error run zero")
 
-       def output(self, msg, i=3):
-          while i > 0:
-             print(msg)
-             i -= 1
+    def run1(self):
+        self.run0()
+        try:
+            pd.DataFrame("err")
+        except Exception as e:
+            self.err(e, "Can no construct dataframe")
 
-te = TestErr()
-te.run()
-msg("### Log msg:")
-log_msg = te.log()
-print(log_msg)
-msg("### Full trace:")
-te.check()
+    def run(self):
+        self.run1()
+        try:
+            "x" > 2
+        except Exception as e:
+            self.err(e)
+
+
+err = TestRun()
+err.reset()
+err.run()
+print("----------- End of the run, checking ------------")
+err.check()
    ```
 
 Output:
