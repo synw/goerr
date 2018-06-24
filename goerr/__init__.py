@@ -136,7 +136,6 @@ class Trace():
             ftb = traceback.format_exc()
             if msg is not None:
                 file, line, caller, code = traceback.extract_tb(tb)[0]
-                file = file.replace("ggg", "username")
                 caller_msg = msg
             msg = str(ex_msg)
         if function is None:
