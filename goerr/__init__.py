@@ -25,7 +25,7 @@ class Err():
     """
 
     def __init__(self, date, function, msg=None, errtype=None, line=None,
-                 file=None, code=None, tb=None, ex=None):
+                 file=None, code=None, tb=None, ex=None, caller=None, caller_msg=None):
         """
         Datastructure of an error
         """
@@ -38,6 +38,8 @@ class Err():
         self.code = code  # string
         self.tb = tb  # string
         self.ex = ex  # Exception
+        self.caller = caller  # string
+        self.caller_msg = caller_msg  # string
 
     def __repr__(self):
         msg = "<goerror.Err object: '" + self.msg + "'>"
@@ -46,7 +48,7 @@ class Err():
     def __str__(self):
         return self._errmsg()
 
-    def _print(self, tb=False, i=None):
+    def printerr(self, tb=False, i=None):
         """
         Print the error message
         """
@@ -62,8 +64,11 @@ class Err():
             errnum = "[" + colors.red("error " + str(i)) + "] "
         msg = errnum
         # function name
-        funcstr = "from " + colors.bold(self.function)
-        msg += str(funcstr)
+        msg += "from " + colors.bold(self.function)
+        if self.caller is not None:
+            msg += " called from " + colors.bold(self.caller)
+        if self.caller_msg is not None:
+            msg += "\n" + self.caller_msg
         if self.type is not None or self.msg is not None:
             msg += "\n"
         if self.type is not None:
@@ -106,12 +111,12 @@ class Trace():
             return True
         return False
 
-    def err(self, arg, **kwargs):
+    def err(self, *args, **kwargs):
         """
         Add an error to the trace
         """
         # get the message or exception
-        ex, msg = self._get_args(arg)
+        ex, msg = self._get_args(*args)
         # construct the error
         # handle exception
         errtype = None
@@ -121,18 +126,35 @@ class Trace():
         line = None
         code = None
         ex_msg = None
+        caller = None
+        caller_msg = None
         if ex is not None:
             # get info from exception
             errobj, ex_msg, tb = sys.exc_info()
             file, line, function, code = traceback.extract_tb(tb)[-1]
             errtype = str(errobj)
             ftb = traceback.format_exc()
+            if msg is not None:
+                file, line, caller, code = traceback.extract_tb(tb)[0]
+                file = file.replace("ggg", "username")
+                caller_msg = msg
             msg = str(ex_msg)
         if function is None:
             function = inspect.stack()[1][3]
         # init error object
         date = datetime.now()
-        error = Err(date, function, msg, errtype, line, file, code, ftb, ex)
+        error = Err(
+            date,
+            function,
+            msg,
+            errtype,
+            line,
+            file,
+            code,
+            ftb,
+            ex,
+            caller,
+            caller_msg)
         # append the error to the trace
         self.errors.append(error)
         # display the error
@@ -143,13 +165,14 @@ class Trace():
         if display is True:
             print(error)
 
-    def check(self, reset=True):
+    def check(self):
         if self.exists is True:
             caller = inspect.stack()[1][3]
             date = datetime.now()
             error = Err(date, caller)
             self.errors.append(error)
             self.trace()
+            self.reset()
 
     def log(self):
         if self.exists is True:
@@ -178,7 +201,7 @@ class Trace():
         # errors = self.errors[::-1]
         i = 1
         for error in self.errors:
-            error._print(True, i)
+            error.printerr(True, i)
             i += 1
 
     def reset(self):
@@ -250,17 +273,15 @@ class Trace():
         else:
             self.trace()"""
 
-    def _get_args(self, arg):
+    def _get_args(self, *args):
         """
         Returns exception, message
         """
         ex = None
         msg = None
-        if isinstance(arg, str):
-            msg = arg
-        elif isinstance(arg, Exception):
-            ex = arg
+        for arg in args:
+            if isinstance(arg, str):
+                msg = arg
+            elif isinstance(arg, Exception):
+                ex = arg
         return ex, msg
-
-
-tr = Trace()

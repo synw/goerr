@@ -55,9 +55,10 @@ Output:
 Or use in a functionnal style:
 
    ```python
-   from goerr import tr
+   from goerr import Trace
    
    
+   tr = Trace()
    tr.err("Error message")
    ```
 
