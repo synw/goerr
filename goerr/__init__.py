@@ -52,12 +52,6 @@ class Err():
         """
         print(self._errmsg(tb, i))
 
-    def _trace(self, i=0):
-        """
-        Print the error message with stack trace
-        """
-        print(self._errmsg(True, i))
-
     def _headline(self, i):
         """
         Format the error message's headline
@@ -68,10 +62,8 @@ class Err():
             errnum = "[" + colors.red("error " + str(i)) + "] "
         msg = errnum
         # function name
-        funcstr = ""
-        if self.function is not None:
-            funcstr = "from " + colors.bold(self.function)
-            msg += str(funcstr)
+        funcstr = "from " + colors.bold(self.function)
+        msg += str(funcstr)
         if self.type is not None or self.msg is not None:
             msg += "\n"
         if self.type is not None:
@@ -114,13 +106,12 @@ class Trace():
             return True
         return False
 
-    def err(self, *args, **kwargs):
+    def err(self, arg, **kwargs):
         """
         Add an error to the trace
         """
-        # check arguments
-        self._check_args(args)
-        ex, msg = self._get_args(args)
+        # get the message or exception
+        ex, msg = self._get_args(arg)
         # construct the error
         # handle exception
         errtype = None
@@ -133,17 +124,12 @@ class Trace():
         if ex is not None:
             # get info from exception
             errobj, ex_msg, tb = sys.exc_info()
-            # if funcname is not None:
             file, line, function, code = traceback.extract_tb(tb)[-1]
             errtype = str(errobj)
             ftb = traceback.format_exc()
+            msg = str(ex_msg)
         if function is None:
             function = inspect.stack()[1][3]
-        if ex_msg is not None:
-            if msg:
-                msg += " " + str(ex_msg)
-            else:
-                msg = str(ex_msg)
         # init error object
         date = datetime.now()
         error = Err(date, function, msg, errtype, line, file, code, ftb, ex)
@@ -152,8 +138,8 @@ class Trace():
         # display the error
         display = True
         if "display" in kwargs:
-            if kwargs["display"] is not False:
-                display = True
+            if kwargs["display"] is False:
+                display = False
         if display is True:
             print(error)
 
@@ -171,8 +157,7 @@ class Trace():
             msg = error.msg
             if error.code is not None:
                 msg += " " + error.code
-            if error.function is not None:
-                msg += " from " + error.function
+            msg += " from " + error.function
             return msg
 
     def stack(self):
@@ -183,11 +168,11 @@ class Trace():
             self.errors.append(error)
 
     def fatal(self, *args):
-        self.err(*args, display=False)
-        self.trace()
-        ex = self.errors[0].ex
-        self.reset()
-        raise(ex)
+        if self.exists is True:
+            self.err(*args, display=False)
+            self.trace()
+            ex = self.errors[0].ex
+            raise(ex)
 
     def trace(self):
         # errors = self.errors[::-1]
@@ -265,29 +250,17 @@ class Trace():
         else:
             self.trace()"""
 
-    def _get_args(self, args):
+    def _get_args(self, arg):
         """
         Returns exception, message
         """
-        exc = None
+        ex = None
         msg = None
-        for arg in args:
-            if isinstance(arg, str):
-                msg = arg
-            elif isinstance(arg, Exception):
-                exc = arg
-        return exc, msg
-
-    def _check_args(self, *args):
-        """
-        Check if the args for the constructor are correct
-        """
-        num_args = len(args[0])
-        if num_args == 0:
-            print("[" + colors.red("error") + "] "
-                  "Goerr error: either a string or an Exception object"
-                  " are required to create an error object")
-            raise
+        if isinstance(arg, str):
+            msg = arg
+        elif isinstance(arg, Exception):
+            ex = arg
+        return ex, msg
 
 
 err = Trace()
