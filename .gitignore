@@ -1,4 +1,5 @@
 *node_modules/
+coverage_html_report
 settings.py
 *.sqlite3
 .project
