@@ -279,15 +279,15 @@ class TestMsgs(unittest.TestCase):
         warning = msgs.warning(1)
         info = msgs.info(1)
         debug = msgs.debug(1)
-        endmsg = "[\033[91m\033[1mfatal error 1\033[0m]"
+        endmsg = "1 [\033[91m\033[1mfatal error\033[0m]"
         self.assertEqual(fatal, endmsg)
-        endmsg = "[\033[91merror 1\033[0m]"
+        endmsg = "1 [\033[91merror\033[0m]"
         self.assertEqual(error, endmsg)
-        endmsg = "[\033[95m\033[1mwarning 1\033[0m]"
+        endmsg = "1 [\033[95m\033[1mwarning\033[0m]"
         self.assertEqual(warning, endmsg)
-        endmsg = "[\033[94minfo 1\033[0m]"
+        endmsg = "1 [\033[94minfo\033[0m]"
         self.assertEqual(info, endmsg)
-        endmsg = "[\033[93mdebug 1\033[0m]"
+        endmsg = "1 [\033[93mdebug\033[0m]"
         self.assertEqual(debug, endmsg)
 
 
