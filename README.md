@@ -62,7 +62,13 @@ Output:
 
 ### Methods:
 
-**`err`**: creates a new error and store it in the trace: parameters: 
+**error**: creates a single error and print it
+
+- `ex`: an exception (optional)
+- `msg`: the message string (optional)
+Either a message string or an exception has to be provided as argument
+
+**`err`**: creates a new error, print it and store it in the trace: parameters: 
 
 - `ex`: an exception (optional)
 - `msg`: the message string (optional)
