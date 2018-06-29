@@ -56,9 +56,17 @@ class Err():
         if "test" not in kwargs:  # pragma: no cover
             sys.exit(1)  # pragma: no cover
 
+    def error(self, *args):
+        """
+        Creates a single error and print it
+        """
+        err = self._new_err("error", *args)
+        if len(args) > 0:
+            print(self._errmsg(err))
+
     def err(self, *args):
         """
-        Creates an error and record it in the trace
+        Creates an error, record it in the trace and print it
         """
         err = self._new_err("error", *args)
         if len(args) > 0:
