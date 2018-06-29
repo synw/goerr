@@ -74,6 +74,8 @@ class Err():
         err = self._new_err("error", *args)
         if len(args) > 0:
             print(self._errmsg(err))
+        else:
+            err.errclass = "via"
         self.errors.append(err)
 
     def warning(self, *args):
@@ -196,8 +198,9 @@ class Err():
             s = ""
             if numerrs > 1:
                 s = "s"
-            print("========= " + str(numerrs) + " error" + s
-                  + " found =========")
+            # print("========= " + str(numerrs) + " call" + s
+            #      + " found =========")
+            print("========= Trace (" + str(numerrs) + ") =========")
         self.print_errs()
         self.errors = []
 
@@ -214,6 +217,8 @@ class Err():
             msg = msgs.info(i)
         elif error.errclass == "debug":
             msg = msgs.debug(i)
+        elif error.errclass == "via":
+            msg = msgs.via(i)
         else:
             msg = msgs.error(i)
         # function name

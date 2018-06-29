@@ -42,6 +42,15 @@ class Msgs():
             head = str(i) + " " + head
         return head
 
+    def via(self, i: int=None) -> str:
+        """
+        Returns an via message
+        """
+        head = "[" + colors.green("via") + "]"
+        if i is not None:
+            head = str(i) + " " + head
+        return head
+
     def debug(self, i: int=None) -> str:
         """
         Returns a debug message
