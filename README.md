@@ -11,32 +11,44 @@ Go style explicit error handling in Python. Propagates errors up the call stack 
 ## Quick example
 
    ```python
-import pandas as pd
-from goerr import Trace
+from datetime import datetime
+from goerr import Err
 
 
-class TestRun(Trace):
+def run_func(funcname):
+    i = 3
+    while i > 0:
+        print(funcname + "running")
+        i -= 1
 
-    def run0(self):
-        self.err("Error run zero")
 
-    def run1(self):
-        self.run0()
+class Foo(Err):
+
+    def func1(self):
+        run_func("func1")
         try:
-            pd.DataFrame("err")
-        except Exception as e:
-            self.err(e, "Can no construct dataframe")
-
-    def run(self):
-        self.run1()
-        try:
-            "x" > 2
+            1 > "bar"
         except Exception as e:
             self.err(e)
+        run_func("func1")
+
+    def func2(self):
+        run_func("func2")
+        try:
+            now = datetime.later()
+        except Exception as e:
+            self.err(e, "Now is not later!")
+        run_func("func2")
+
+
+foo = Foo()
+foo.func1()
+foo.func2()
+print("Run finished, checking:")
+foo.trace()
 
 
 err = TestRun()
-err.reset()
 err.run()
 print("----------- End of the run, checking ------------")
 err.check()
@@ -46,16 +58,6 @@ Output:
 
 ![Stack trace screenshot](docs/img/output.png)
 
-Or use in a functionnal style:
-
-   ```python
-   from goerr import Trace
-   
-   
-   tr = Trace()
-   tr.err("Error message")
-   ```
-
 ## API
 
 ### Methods:
@@ -64,22 +66,27 @@ Or use in a functionnal style:
 
 - `ex`: an exception (optional)
 - `msg`: the message string (optional)
-Either a message string or an exception has to be provided as argument.
-
-**`trace`**: prints the errors trace
-
-**`check`**: check if error exists and run `trace()` if it does
+Either a message string or an exception has to be provided as argument for the error to be
+printed. If no argument is provided it will just record the function name to keep trace of
+the call stack
 
 **`fatal`**: check if error exists, run `trace()` if it does and raise an exception
 
-**`stack`**: add an error to the trace with no message if one previous error exists. Used
-to keep track of the call stack
+**`warning`**: prints a warning message and add it to the trace
+
+**`info`**: prints an info message and add it to the trace
+
+**`debug`**: prints a debug message and add it to the trace
+
+**`trace`**: prints the errors trace and reset it
 
 **`log`**: returns a log message from the first error
 
 ### Properties:
 
-**`exists`**: check if there are some errors in the trace. Returns `True` or `False`
+**`errors`**: list of the errors
+
+Check the examples directory for code
 
 ## Why?
 
