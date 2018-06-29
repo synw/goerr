@@ -60,6 +60,9 @@ class Err():
         """
         Creates a single error and print it
         """
+        if len(args) == 0:
+            print("Error from goerr.Err.error: either an exception"
+                  " or a message has to be provided as argument")
         err = self._new_err("error", *args)
         if len(args) > 0:
             print(self._errmsg(err))
