@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime
+# from pandas import pandas as pd
 from goerr import Err
 from goerr.messages import Msgs
 from goerr.colors import colors
@@ -40,7 +41,7 @@ class ErrTest(unittest.TestCase):
         print("ERRORS", tr.errors)
         self.assertEqual(tr.log(), "Another error")
 
-    """def test_caller(self):
+    def test_caller(self):
         class Foo():
             def func1(self):
                 try:
@@ -57,7 +58,43 @@ class ErrTest(unittest.TestCase):
 
         Foo().func2()
         self.assertEqual(tr.errors[0].caller, "func2")
-        self.assertEqual(tr.errors[0].function, "func1")"""
+        self.assertEqual(tr.errors[0].function, "func1")
+        self.assertEqual(tr.errors[1].caller, "test_caller")
+        self.assertEqual(tr.errors[1].function, "func2")
+
+    """def test_caller_from_lib(self):
+
+        class Bar(Err):
+
+            def func1(self):
+                df = None
+                try:
+                    df = pd.DataFrame("wrong")
+                except Exception as e:
+                    self.err(e)
+                return df
+
+            def func2(self):
+                try:
+                    df = self.func1()
+                    df2 = df.copy()
+                except Exception as e:
+                    self.err(e, "Can not copy dataframe")
+
+        foo = Bar()
+        print("lenerr", len(foo.errors))
+        foo.func2()
+        print("ERRS -----------------")
+        i = 0
+        for el in foo.errors:
+            print(i, el.caller, el.function)
+            i += 1
+        #self.assertEqual(tr.errors[0].caller, "test_caller_from_lib")
+        #self.assertEqual(tr.errors[0].function, "func2")
+        print("ERR 0", foo.errors[0].caller, foo.errors[0].function)
+        print("ERR 1", foo.errors[1].caller, foo.errors[1].function)
+        self.assertEqual(foo.errors[1].function, "func1")
+        self.assertEqual(foo.errors[1].caller, "__init__")"""
 
     def test_fatal(self):
         try:
@@ -83,6 +120,20 @@ class ErrTest(unittest.TestCase):
         tr.debug(msg)
         self.assertEqual(tr.errors[0].msg, msg)
 
+    def test_single_error(self):
+        tr.errors = []
+        msg = "A message"
+        tr.error(msg)
+        self.assertEqual(len(tr.errors), 0)
+        tr.error()
+
+    def test_via(self):
+        tr.errors = []
+        msg = "A message"
+        tr.err(msg)
+        tr.err()
+        self.assertEqual(len(tr.errors), 2)
+
     def test_colors(self):
         color = '\033[94m'
         msg = "color"
@@ -109,143 +160,6 @@ class ErrTest(unittest.TestCase):
         txt = colors.underline(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
-
-
-"""
-class TestErr(Trace):
-
-    def create(self):
-        try:
-            "a" > 1
-        except Exception as e:
-            tr.err(e)
-            return e
-
-    def create_from_msg(self):
-        return tr.err("Error message")
-
-
-class GoerrTest(unittest.TestCase):
-
-    def setUp(self):
-        tr.err = TestErr()
-
-    def test_err_from_ex(self):
-        self.assertFalse(len (tr.errors) > 0)
-        ex = tr.err.create()
-        self.assertTrue(len (tr.errors) > 0)
-        self.assertEqual(len(tr.errs), 1)
-        err = tr.errs[0]
-        self.assertEqual(err.ex, ex)
-        self.assertEqual(err.type, "<class 'TypeError'>")
-        self.assertEqual(err.msg, "unorderable types: str() > int()")
-
-    def test_err_from_msg(self):
-        tr.err.create_from_msg()
-        self.assertEqual(len(tr.errs), 2)
-        self.assertEqual(tr.errs[1].msg, "Error message")
-
-    def test_reset(self):
-        tr.errors = []
-        self.assertEqual(len(tr.errs), 0)
-
-    def test_log(self):
-        tr.errors = []
-        tr.err.create_from_msg()
-        msg = tr.err.log()
-        self.assertEqual(msg, "Error message from create_from_msg")
-        tr.errors = []
-        tr.err.create()
-        msg = tr.err.log()
-        self.assertEqual(
-            msg, 'unorderable types: str() > int() "a" > 1 from create')
-        tr.errors = []
-        msg = tr.err.log()
-        self.assertIsNone(msg)
-
-    def test_stack(self):
-        tr.errors = []
-        tr.err.stack()
-        self.assertEqual(len(tr.errs), 0)
-        tr.err.create_from_msg()
-        tr.err.stack()
-        self.assertEqual(len(tr.errs), 2)
-        err = tr.errs[1]
-        # expected = "[" + colors.red("Error") + "] "
-        # expected += "from " + colors.bold("create_from_msg") + "\n"
-        # expected += "Error message
-        self.assertIsNone(err.msg)
-        self.assertEqual(err.function, "test_stack")
-
-    def test_check(self):
-        tr.errors = []
-        self.trace()
-        self.assertEqual(len(tr.errs), 0)
-        tr.err.create_from_msg()
-        self.trace()
-
-    "def test_fatal(self):
-        tr.errors = []
-        tr.err.create()
-        try:
-            "x" > 2
-        except Exception as e:
-            tr.err.fatal(e)
-        #self.assertEqual(len(tr.errs), 1)
-        self.assertRaises(TypeError)""
-
-    def test_display(self):
-        tr.errors = []
-        tr.err("Error message", display=True)
-        tr.err("Error message", display=False)
-        tr.err("Error message")
-
-    def test_get_args(self):
-        tr.errors = []
-        e = tr.err.create()
-        ex, _ = tr.err._get_args(e)
-        self.assertEqual(ex, e)
-        _, msg = tr.err._get_args("Error message")
-        self.assertEqual(msg, "Error message")
-
-    def test_err_msg_traceback(self):
-        tr.errors = []
-        tr.err.create()
-        err = tr.errs[0]
-        err._errmsg(True)
-        self.assertIsNotNone(err.tb)
-        tr.errors = []
-        tr.err.create_from_msg()
-        err = tr.errs[0]
-        err._errmsg(True)
-        self.assertIsNone(err.tb)
-
-    def test_colors(self):
-        color = '\033[94m'
-        msg = "color"
-        txt = colors.blue(msg)
-        res = color + msg + "\033[0m"
-        self.assertEqual(txt, res)
-        color = '\033[92m'
-        txt = colors.green(msg)
-        res = color + msg + "\033[0m"
-        self.assertEqual(txt, res)
-        color = '\033[93m'
-        txt = colors.yellow(msg)
-        res = color + msg + "\033[0m"
-        self.assertEqual(txt, res)
-        color = '\033[95m'
-        txt = colors.purple(msg)
-        res = color + msg + "\033[0m"
-        self.assertEqual(txt, res)
-        color = '\033[1m'
-        txt = colors.bold(msg)
-        res = color + msg + "\033[0m"
-        self.assertEqual(txt, res)
-        color = '\033[4m'
-        txt = colors.underline(msg)
-        res = color + msg + "\033[0m"
-        self.assertEqual(txt, res)"""
 
 
 msgs = Msgs()
@@ -261,6 +175,7 @@ class TestMsgs(unittest.TestCase):
         error = msgs.error()
         warning = msgs.warning()
         info = msgs.info()
+        via = msgs.via()
         debug = msgs.debug()
         endmsg = "[\033[91m\033[1mfatal error\033[0m]"
         self.assertEqual(fatal, endmsg)
@@ -272,6 +187,8 @@ class TestMsgs(unittest.TestCase):
         self.assertEqual(info, endmsg)
         endmsg = "[\033[93mdebug\033[0m]"
         self.assertEqual(debug, endmsg)
+        endmsg = "[\033[92mvia\033[0m]"
+        self.assertEqual(via, endmsg)
 
     def test_msgs_with_numbers(self):
         fatal = msgs.fatal(1)
@@ -279,6 +196,7 @@ class TestMsgs(unittest.TestCase):
         warning = msgs.warning(1)
         info = msgs.info(1)
         debug = msgs.debug(1)
+        via = msgs.via(1)
         endmsg = "1 [\033[91m\033[1mfatal error\033[0m]"
         self.assertEqual(fatal, endmsg)
         endmsg = "1 [\033[91merror\033[0m]"
@@ -289,6 +207,8 @@ class TestMsgs(unittest.TestCase):
         self.assertEqual(info, endmsg)
         endmsg = "1 [\033[93mdebug\033[0m]"
         self.assertEqual(debug, endmsg)
+        endmsg = "1 [\033[92mvia\033[0m]"
+        self.assertEqual(via, endmsg)
 
 
 if __name__ == '__main__':
