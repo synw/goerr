@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 from .colors import colors
 from .messages import Msgs
+from typing import List
 
 msgs = Msgs()
 
@@ -129,14 +130,24 @@ class Err():
             errobj, ex_msg, tb = sys.exc_info()
             file, line, function, code = traceback.extract_tb(tb)[-1]
 
-            caller = st[-3][3]
+            # if called from an eternal lib
+            tb = traceback.extract_tb(tb)
+            if len(tb) > 1:
+                file, line, caller, code = tb[-2]
+            else:
+                call_stack = []
+                for c in st:
+                    call_stack.append(c[3])
+                caller = self._get_caller(call_stack, function)
+
             internals = [
                 "err",
                 "_new_err",
                 "fatal",
                 "warning",
                 "debug",
-                "info"]
+                "info",
+                "<module>"]
             if caller == function or caller in internals:
                 caller = None
             # handle messages
@@ -250,6 +261,17 @@ class Err():
         return msg
 
     # internal method
+
+    def _get_caller(self, callers: List[str], function: str) -> str:
+        """
+        Get the caller function from the provided function
+        """
+        is_next = False
+        for c in callers:
+            if is_next is True:
+                return c
+            if function == c:
+                is_next = True
 
     def _get_args(self, *args) -> (Exception, str):
         """
