@@ -9,6 +9,7 @@ def run_func(funcname, i=3):
 
 
 class Foo(Err):
+    trace_errs = True
 
     def run(self):
         run_func("run", 1)

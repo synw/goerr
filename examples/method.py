@@ -34,5 +34,4 @@ class Foo(Err):
 
 foo = Foo()
 foo.run()
-print("Run finished, checking:")
-foo.trace()
+print("Run finished")

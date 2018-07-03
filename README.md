@@ -23,6 +23,8 @@ def run_func(funcname):
 
 
 class Foo(Err):
+	# activate the errors trace
+	trace_errs = True
 
     def func1(self):
         run_func("func1")
@@ -46,12 +48,6 @@ foo.func1()
 foo.func2()
 print("Run finished, checking:")
 foo.trace()
-
-
-err = TestRun()
-err.run()
-print("----------- End of the run, checking ------------")
-err.check()
    ```
 
 Output:
@@ -91,6 +87,10 @@ the call stack
 ### Properties:
 
 **`errors`**: list of the errors
+
+**`trace_errs`**: activate the errors trace: True or False. Default is False.
+
+**`errs_traceback`**: print the stack trace when displaying the errors. Default is True
 
 Check the examples directory for code
 

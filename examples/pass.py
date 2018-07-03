@@ -1,5 +1,8 @@
-from datetime import datetime
 from goerr import Err
+
+"""
+Pass error to keep track of the call stack in the trace
+"""
 
 
 def run_func(funcname):
@@ -10,6 +13,7 @@ def run_func(funcname):
 
 
 class Foo(Err):
+    trace_errs = True
 
     def run(self):
         self.func2()

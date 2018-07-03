@@ -1,12 +1,13 @@
 import unittest
 from datetime import datetime
-# from pandas import pandas as pd
+from pandas import pandas as pd
 from goerr import Err
 from goerr.messages import Msgs
 from goerr.colors import colors
 
 
 tr = Err()
+tr.trace_errs = True
 
 
 class ErrTest(unittest.TestCase):
@@ -35,12 +36,6 @@ class ErrTest(unittest.TestCase):
         tr.err("Another error")
         tr.trace()
 
-    def test_log(self):
-        tr.errors = []
-        tr.err("Another error")
-        print("ERRORS", tr.errors)
-        self.assertEqual(tr.log(), "Another error")
-
     def test_caller(self):
         class Foo():
             def func1(self):
@@ -66,6 +61,9 @@ class ErrTest(unittest.TestCase):
 
         class Bar(Err):
 
+            def run(self):
+                self.func3()
+
             def func1(self):
                 df = None
                 try:
@@ -81,20 +79,48 @@ class ErrTest(unittest.TestCase):
                 except Exception as e:
                     self.err(e, "Can not copy dataframe")
 
+            def func3(self):
+                #df = self.func1()
+                self.func2()
+                try:
+                    "a" > 1
+                except Exception as e:
+                    self.err(e)
+
         foo = Bar()
-        print("lenerr", len(foo.errors))
-        foo.func2()
+        foo.run()
         print("ERRS -----------------")
         i = 0
         for el in foo.errors:
             print(i, el.caller, el.function)
             i += 1
-        #self.assertEqual(tr.errors[0].caller, "test_caller_from_lib")
-        #self.assertEqual(tr.errors[0].function, "func2")
-        print("ERR 0", foo.errors[0].caller, foo.errors[0].function)
-        print("ERR 1", foo.errors[1].caller, foo.errors[1].function)
-        self.assertEqual(foo.errors[1].function, "func1")
-        self.assertEqual(foo.errors[1].caller, "__init__")"""
+        print("********************************")
+        tr.trace()
+        print("********************************")
+        self.assertEqual(foo.errors[0].function, "__init__")
+        self.assertEqual(foo.errors[0].caller, "func1")"""
+
+    def test_no_traceback(self):
+        tr.errors = []
+        tr.errs_traceback = False
+        try:
+            "a" > 1
+        except Exception as e:
+            tr.err(e)
+        tr.err("Another error")
+        tr.trace()
+        tr.errs_traceback = True
+
+    def test_no_trace(self):
+        tr.errors = []
+        tr.trace_errs = False
+        try:
+            "a" > 1
+        except Exception as e:
+            tr.err(e)
+        tr.err("Another error")
+        self.assertEqual(len(tr.errors), 0)
+        tr.trace_errs = True
 
     def test_fatal(self):
         try:
@@ -133,6 +159,7 @@ class ErrTest(unittest.TestCase):
         tr.err(msg)
         tr.err()
         self.assertEqual(len(tr.errors), 2)
+        tr.trace()
 
     def test_colors(self):
         color = '\033[94m'

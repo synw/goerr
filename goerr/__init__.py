@@ -15,6 +15,8 @@ class Err():
     Errors manager
     """
     errors = []  # type: List[Err]
+    trace_errs = False  # type: bool
+    errs_traceback = True  # type: bool
 
     def __init__(self, function: str=None, date: datetime=datetime.now(),
                  msg: str=None, errtype: str=None, errclass: str=None,
@@ -64,9 +66,9 @@ class Err():
         if len(args) == 0:
             print("Error from goerr.Err.error: either an exception"
                   " or a message has to be provided as argument")
+            return
         err = self._new_err("error", *args)
-        if len(args) > 0:
-            print(self._errmsg(err))
+        print(self._errmsg(err))
 
     def err(self, *args):
         """
@@ -77,7 +79,8 @@ class Err():
             print(self._errmsg(err))
         else:
             err.errclass = "via"
-        self.errors.append(err)
+        if self.trace_errs is True:
+            self.errors.append(err)
 
     def warning(self, *args):
         """
@@ -85,7 +88,8 @@ class Err():
         """
         err = self._new_err("warning", *args)
         print(self._errmsg(err))
-        self.errors.append(err)
+        if self.trace_errs is True:
+            self.errors.append(err)
 
     def info(self, *args):
         """
@@ -93,7 +97,8 @@ class Err():
         """
         err = self._new_err("info", *args)
         print(self._errmsg(err))
-        self.errors.append(err)
+        if self.trace_errs is True:
+            self.errors.append(err)
 
     def debug(self, *args):
         """
@@ -101,7 +106,8 @@ class Err():
         """
         err = self._new_err("debug", *args)
         print(self._errmsg(err))
-        self.errors.append(err)
+        if self.trace_errs is True:
+            self.errors.append(err)
 
     # main constructor
 
@@ -130,7 +136,7 @@ class Err():
             errobj, ex_msg, tb = sys.exc_info()
             file, line, function, code = traceback.extract_tb(tb)[-1]
 
-            # if called from an eternal lib
+            # if called from an external lib
             tb = traceback.extract_tb(tb)
             if len(tb) > 1:
                 file, line, caller, code = tb[-2]
@@ -179,15 +185,6 @@ class Err():
 
     # display
 
-    def log(self) -> str:
-        """
-        Returns a basic log message from the first error found
-        """
-        if len(self.errors) > 0:
-            for el in self.errors:
-                if el.errclass == "error":
-                    return el.msg
-
     def print_errs(self):
         """
         Prints the errors trace with tracebacks
@@ -196,7 +193,7 @@ class Err():
         for error in self.errors:
             print(self._errmsg(error, tb=True, i=i))
             # for spacing
-            if error.tb is None:
+            if self.errs_traceback is False:
                 print()
             i += 1
 
@@ -206,11 +203,6 @@ class Err():
         """
         if len(self.errors) > 0:
             numerrs = len(self.errors)
-            s = ""
-            if numerrs > 1:
-                s = "s"
-            # print("========= " + str(numerrs) + " call" + s
-            #      + " found =========")
             print("========= Trace (" + str(numerrs) + ") =========")
         self.print_errs()
         self.errors = []
@@ -246,7 +238,7 @@ class Err():
             msg += str(error.msg)
         return msg
 
-    def _errmsg(self, error, tb: bool=False, i: int=None) -> str:
+    def _errmsg(self, error: "Err", tb: bool=False, i: int=None) -> str:
         """
         Get the error message
         """
@@ -255,7 +247,7 @@ class Err():
             msg += "\n" + "line " + colors.bold(str(error.line))
             msg += ": " + colors.yellow(error.code)
             msg += "\n" + str(error.file)
-            if tb is True:
+            if self.errs_traceback is True or tb is True:
                 if error.tb is not None:
                     msg += "\n" + error.tb
         return msg

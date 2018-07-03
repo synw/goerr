@@ -1,6 +1,10 @@
 from datetime import datetime
 from goerr import Err
 
+"""
+Print basic errors
+"""
+
 
 def run_func(funcname):
     i = 3
@@ -31,5 +35,4 @@ class Foo(Err):
 foo = Foo()
 foo.func1()
 foo.func2()
-print("Run finished, checking:")
-foo.trace()
+print("Run finished")
