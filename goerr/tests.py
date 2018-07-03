@@ -1,6 +1,5 @@
 import unittest
 from datetime import datetime
-from pandas import pandas as pd
 from goerr import Err
 from goerr.messages import Msgs
 from goerr.colors import colors
