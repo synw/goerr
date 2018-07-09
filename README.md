@@ -58,12 +58,6 @@ Output:
 
 ### Methods:
 
-**error**: creates a single error and print it
-
-- `ex`: an exception (optional)
-- `msg`: the message string (optional)
-Either a message string or an exception has to be provided as argument
-
 **`err`**: creates a new error, print it and store it in the trace: parameters: 
 
 - `ex`: an exception (optional)
@@ -83,6 +77,12 @@ the call stack
 **`trace`**: prints the errors trace and reset it
 
 **`log`**: returns a log message from the first error
+
+**error**: creates a single error and print it without recording it in the trace. This is only useful when the `trace_errs` option is activated
+
+- `ex`: an exception (optional)
+- `msg`: the message string (optional)
+Either a message string or an exception has to be provided as argument
 
 ### Properties:
 
