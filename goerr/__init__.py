@@ -111,7 +111,7 @@ class Err():
 
     # main constructor
 
-    def _new_err(self, errclass: str, *args):
+    def _new_err(self, errclass: str, *args) -> 'Err':
         """
         Error constructor
         """
@@ -134,12 +134,11 @@ class Err():
         if ex is not None:
             # get info from exception
             errobj, ex_msg, tb = sys.exc_info()
-            file, line, function, code = traceback.extract_tb(tb)[-1]
-
-            # if called from an external lib
             tb = traceback.extract_tb(tb)
+            file, line, function, code = tb[-1]
+            # if called from an external lib
             if len(tb) > 1:
-                file, line, caller, code = tb[-2]
+                file, line, caller, code = tb[0]
             else:
                 call_stack = []
                 for c in st:
