@@ -1,8 +1,10 @@
 import unittest
+#import pandas as pd
 from datetime import datetime
 from goerr import Err
 from goerr.messages import Msgs
 from goerr.colors import colors
+from goerr.testing import assert_err
 
 
 tr = Err()
@@ -23,15 +25,20 @@ class ErrTest(unittest.TestCase):
     def test_str(self):
         tr.errors = []
         tr.err("An error message")
-        msg = "[\033[91merror\033[0m] from \033[1mtest_str\033[0m\nAn error message"
+        msg = "[\033[91merror\033[0m] from \033[1mtest_str\033[0m\n" \
+            "An error message"
         self.assertEqual(tr.__str__(), msg)
 
     def test_error(self):
         tr.errors = []
-        try:
-            "a" > 1
-        except Exception as e:
-            tr.err(e)
+
+        def run():
+            try:
+                "a" > 1
+            except Exception as e:
+                tr.err(e)
+
+        assert_err("TypeError", run)
         tr.err("Another error")
         self.assertEqual(len(tr.errors), 2)
         tr.trace()
@@ -64,7 +71,8 @@ class ErrTest(unittest.TestCase):
                 except Exception as e:
                     tr.err(e, "Now is not later!")
 
-        Foo().func2()
+        foo = Foo()
+        foo.func2()
         self.assertEqual(tr.errors[0].caller, "func2")
         self.assertEqual(tr.errors[0].function, "func1")
         self.assertEqual(tr.errors[1].caller, "test_caller")
@@ -82,6 +90,7 @@ class ErrTest(unittest.TestCase):
             self.assertEqual(msg, "msg")
 
     """def test_caller_from_lib(self):
+        print("---------------------------- ccccccccccccccc")
 
         class Bar(Err):
 
@@ -94,6 +103,7 @@ class ErrTest(unittest.TestCase):
                     df = pd.DataFrame("wrong")
                 except Exception as e:
                     self.err(e)
+                    print("ERR 1", self.errors[0])
                 return df
 
             def func2(self):
@@ -113,14 +123,11 @@ class ErrTest(unittest.TestCase):
 
         foo = Bar()
         foo.run()
-        print("ERRS -----------------")
         i = 0
+        print("ERRS: ", foo.errors)
         for el in foo.errors:
             print(i, el.caller, el.function)
             i += 1
-        print("********************************")
-        tr.trace()
-        print("********************************")
         self.assertEqual(foo.errors[0].function, "__init__")
         self.assertEqual(foo.errors[0].caller, "func1")"""
 
