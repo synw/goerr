@@ -108,19 +108,25 @@ A helper function is available to test errors:
 Example:
 
    ```python
+# the program
 from goerr import Err
-from goerr.testing import assert_err
    
-class Foo(Err):
+   class Foo(Err):
+      def func1(self, param1, param2):
+          try:
+              param1 > param2
+          except Exception as e:
+              self.err(e)
 
-    def func1(self, param1, param2):
-        try:
-            param1 > param2
-        except Exception as e:
-            self.err(e)
-        
-foo = Foo()
-assert_err("TypeError", foo.func1, 1, "bar")
+# the test
+import unittest
+from goerr.testing import assert_err
+from myprogram import Foo
+
+   class MyTest(unittest.TestCase):
+	  def test_myprogram(self):
+          foo = Foo()
+          assert_err("TypeError", foo.func1, 1, "bar")
    ```
 
 ## Why?
