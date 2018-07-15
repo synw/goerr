@@ -108,6 +108,7 @@ A helper function is available to test errors:
 Example:
 
    ```python
+from goerr import Err
 from goerr.testing import assert_err
    
 class Foo(Err):
