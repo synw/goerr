@@ -119,7 +119,7 @@ class Foo(Err):
             self.err(e)
         
 foo = Foo()
-assert_err("TypeError", foo, 1, "bar")
+assert_err("TypeError", foo.func1, 1, "bar")
    ```
 
 ## Why?
