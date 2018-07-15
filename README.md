@@ -94,6 +94,34 @@ Either a message string or an exception has to be provided as argument
 
 Check the examples directory for code
 
+## Testing errors in programs
+
+A helper function is available to test errors:
+
+**`testing.assert_err`**: parameters: 
+
+- `error type`: a string with the error type
+- `function to run`: the function to test
+- `*args`: function arguments
+- `**kwargs`: function keyword arguments
+
+Example:
+
+   ```python
+from goerr.testing import assert_err
+   
+class Foo(Err):
+
+    def func1(self, param1, param2):
+        try:
+            param1 > param2
+        except Exception as e:
+            self.err(e)
+        
+foo = Foo()
+assert_err("TypeError", foo, 1, "bar")
+   ```
+
 ## Why?
 
 I like the explicit errors management in Go (unlike many people) and I wanted to have the
