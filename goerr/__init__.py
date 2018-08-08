@@ -81,6 +81,7 @@ class Err():
             err.errclass = "via"
         if self.trace_errs is True:
             self.errors.append(err)
+        return err
 
     def warning(self, *args):
         """
