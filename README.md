@@ -76,8 +76,6 @@ the call stack
 
 **`trace`**: prints the errors trace and reset it
 
-**`log`**: returns a log message from the first error
-
 **error**: creates a single error and print it without recording it in the trace. This is only useful when the `trace_errs` option is activated
 
 - `ex`: an exception (optional)
