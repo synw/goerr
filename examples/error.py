@@ -1,3 +1,4 @@
+import pprint
 from datetime import datetime
 from goerr import Err
 
@@ -28,7 +29,10 @@ class Foo(Err):
         try:
             now = datetime.later()
         except Exception as e:
-            self.err(e, "Now is not later!")
+            error = self.err(e, "Now is not later!")
+            print("Dictionnary with the error elements:")
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(self.errdict(error))
         run_func("func2")
 
 

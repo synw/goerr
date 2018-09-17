@@ -19,14 +19,15 @@ class Foo(Err):
         df = None
         run_func("func1")
         try:
-            df = pd.DataFrame("wrong")
+            df = pd.DataFrame([[1, 2, 3]])
+            df.head("wrong")
         except Exception as e:
             self.err(e)
         run_func("func1")
         return df
 
     def func2(self):
-        #df = self.func1()
+        # df = self.func1()
         run_func("func2")
         try:
             df = self.func1()
@@ -36,7 +37,7 @@ class Foo(Err):
         run_func("func2")
 
     def func3(self):
-        #df = self.func1()
+        # df = self.func1()
         run_func("func3")
         self.func2()
         try:

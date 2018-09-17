@@ -1,7 +1,7 @@
 import inspect
 import traceback
 import sys
-# import json
+import logging
 from datetime import datetime
 from .colors import colors
 from .messages import Msgs
@@ -17,6 +17,10 @@ class Err():
     errors = []  # type: List[Err]
     trace_errs = False  # type: bool
     errs_traceback = True  # type: bool
+    logger = None  # type: logging.Logger
+    log_errs = False  # type: bool
+    log_format = "csv"  # type: str
+    log_path = "errors.log"  # type: str
 
     def __init__(self, function: str=None, date: datetime=datetime.now(),
                  msg: str=None, errtype: str=None, errclass: str=None,
@@ -37,6 +41,21 @@ class Err():
         self.ex = ex  # type: Exception
         self.caller = caller  # type: str
         self.caller_msg = caller_msg  # type: str
+        self._init_logger()
+        if self.trace_errs is True:
+            self.errs_traceback = False
+        
+    def _init_logger(self):
+        """
+        Init logger
+        """
+        if self.log_path != "errors.log":
+            self.log_errs = True
+        if self.log_errs is True:
+            self.logger = logging.getLogger(__name__)
+            f_handler = logging.FileHandler(self.log_path)
+            f_handler.setLevel(logging.ERROR)
+            self.logger.addHandler(f_handler)
 
     def __repr__(self):
         s = "s"
@@ -51,66 +70,84 @@ class Err():
         for error in self.errors:
             msg = msg + self._errmsg(error)
         return msg
-
-    def fatal(self, *args, **kwargs):
-        err = self._new_err("fatal", *args)
-        self.errors.append(err)
-        self.trace()
-        if "test" not in kwargs:  # pragma: no cover
-            sys.exit(1)  # pragma: no cover
-
-    def error(self, *args):
-        """
-        Creates a single error and print it
-        """
-        if len(args) == 0:
-            print("Error from goerr.Err.error: either an exception"
-                  " or a message has to be provided as argument")
-            return
-        err = self._new_err("error", *args)
-        print(self._errmsg(err))
-
+            
     def err(self, *args):
         """
-        Creates an error, record it in the trace and print it
+        Creates an error
         """
-        err = self._new_err("error", *args)
-        if len(args) > 0:
-            print(self._errmsg(err))
-        else:
-            err.errclass = "via"
+        return self._err(*args)
+    
+    def panic(self, *args):
+        """
+        Creates a fatal error and exit
+        """
+        self._err(*args)
         if self.trace_errs is True:
-            self.errors.append(err)
-        return err
+            self.trace()
+        sys.exit(1)  # pragma: no cover
+
+    def _err(self, *args):
+        """
+        Creates an error, fatal or not
+        """
+        error = self._new_err("error", *args)
+        if self.log_errs is True:
+            sep = " "
+            if self.log_format == "csv":
+                sep = ","
+            msg = str(datetime.now()) + sep + \
+                self._errmsg(error, msgformat=self.log_format)
+            self.logger.error(msg)
+        if len(args) > 0:
+            print(self._errmsg(error))
+        else:
+            error.errclass = "via"
+        if self.trace_errs is True:
+            self.errors.append(error)
+        return error
 
     def warning(self, *args):
         """
-        Creates a warning message and record it in the trace
+        Creates a warning message
         """
-        err = self._new_err("warning", *args)
-        print(self._errmsg(err))
+        error = self._new_err("warning", *args)
+        print(self._errmsg(error))
         if self.trace_errs is True:
-            self.errors.append(err)
+            self.errors.append(error)
 
     def info(self, *args):
         """
-        Creates an info message and record it in the trace
+        Creates an info message
         """
-        err = self._new_err("info", *args)
-        print(self._errmsg(err))
+        error = self._new_err("info", *args)
+        print(self._errmsg(error))
         if self.trace_errs is True:
-            self.errors.append(err)
+            self.errors.append(error)
+            
+    def errdict(self, error: "Err"):
+        """
+        Returns a dictionnary with the error elements
+        """
+        return self._errmsg(error, msgformat="dict")
 
     def debug(self, *args):
         """
-        Creates a debug message and record it in the trace
+        Creates a debug message
         """
-        err = self._new_err("debug", *args)
-        print(self._errmsg(err))
+        error = self._new_err("debug", *args)
+        print(self._errmsg(error))
         if self.trace_errs is True:
-            self.errors.append(err)
-
-    # main constructor
+            self.errors.append(error)
+            
+    def trace(self):
+        """
+        Print the errors trace if there are some errors
+        """
+        if len(self.errors) > 0:
+            numerrs = len(self.errors)
+            print("========= Trace (" + str(numerrs) + ") =========")
+        self._print_errs()
+        self.errors = []
 
     def _new_err(self, errclass: str, *args) -> 'Err':
         """
@@ -153,7 +190,7 @@ class Err():
                 "warning",
                 "debug",
                 "info",
-                "<module>"]
+                "<module>"]  
             if caller == function or caller in internals:
                 caller = None
             # handle messages
@@ -165,7 +202,7 @@ class Err():
             ftb = traceback.format_exc()
             errtype = errobj.__name__
         if function is None:
-            function = st[2][3]
+            function = st[3][3]
         # init error object
         date = datetime.now()
         error = Err(
@@ -183,9 +220,7 @@ class Err():
             caller_msg)
         return error
 
-    # display
-
-    def print_errs(self):
+    def _print_errs(self):
         """
         Prints the errors trace with tracebacks
         """
@@ -196,16 +231,6 @@ class Err():
             if self.errs_traceback is False:
                 print()
             i += 1
-
-    def trace(self):
-        """
-        Print the errors trace if there are some errors
-        """
-        if len(self.errors) > 0:
-            numerrs = len(self.errors)
-            print("========= Trace (" + str(numerrs) + ") =========")
-        self.print_errs()
-        self.errors = []
 
     def _headline(self, error, i: int) -> str:
         """
@@ -238,21 +263,45 @@ class Err():
             msg += str(error.msg)
         return msg
 
-    def _errmsg(self, error: "Err", tb: bool=False, i: int=None) -> str:
+    def _errmsg(self, error: "Err", tb: bool=False, i: int=None,
+                msgformat: str="terminal") -> str:
         """
         Get the error message
         """
-        msg = self._headline(error, i)
-        if error.ex is not None:
-            msg += "\n" + "line " + colors.bold(str(error.line))
-            msg += ": " + colors.yellow(error.code)
-            msg += "\n" + str(error.file)
-            if self.errs_traceback is True or tb is True:
-                if error.tb is not None:
-                    msg += "\n" + error.tb
+        if msgformat == "terminal":
+            msg = self._headline(error, i)
+            if error.ex is not None:
+                msg += "\n" + "line " + colors.bold(str(error.line))
+                msg += ": " + colors.yellow(error.code)
+                msg += "\n" + str(error.file)
+                if self.errs_traceback is True or tb is True:
+                    if error.tb is not None:
+                        msg += "\n" + error.tb
+        elif msgformat == "csv":
+            sep = ","
+            msg = error.msg + sep
+            msg += str(error.line) + sep + error.code + sep
+            msg += str(error.file)
+        elif msgformat == "text":
+            sep = ","
+            msg = error.msg
+            if error.ex is not None:
+                msg += sep + str(error.line) + sep + error.code + sep
+                msg += str(error.file) + sep         
+                if self.errs_traceback is True or tb is True:
+                    if error.tb is not None:
+                        msg += sep + error.tb
+        elif msgformat == "dict":
+            msg = {"date": datetime.now()}
+            if error.ex is not None:
+                msg["msg"] = error.msg
+                msg["line"] = error.line
+                msg["code"] = error.code
+                msg["file"] = error.file         
+                if self.errs_traceback is True or tb is True:
+                    if error.tb is not None:
+                        msg["traceback"] = error.tb
         return msg
-
-    # internal method
 
     def _get_caller(self, callers: List[str], function: str) -> str:
         """
@@ -277,3 +326,4 @@ class Err():
             elif isinstance(arg, Exception):
                 ex = arg
         return ex, msg
+

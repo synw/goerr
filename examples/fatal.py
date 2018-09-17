@@ -19,7 +19,7 @@ class Foo(Err):
         try:
             1 > "bar"
         except Exception as e:
-            self.fatal(e)
+            self.panic(e)
         run_func("func1")
 
     def func2(self):
