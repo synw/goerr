@@ -75,7 +75,10 @@ class Err():
         """
         Creates an error
         """
-        return self._err(*args)
+        error = self._err(*args)
+        if self.trace_errs is False:
+            sys.exit(1)  # pragma: no cover
+        return error
     
     def panic(self, *args):
         """
@@ -101,7 +104,10 @@ class Err():
         if len(args) > 0:
             print(self._errmsg(error))
         else:
-            error.errclass = "via"
+            if len(self.errors) > 0:
+                error.errclass = "via"
+            else:
+                return
         if self.trace_errs is True:
             self.errors.append(error)
         return error
@@ -327,3 +333,5 @@ class Err():
                 ex = arg
         return ex, msg
 
+
+err = Err().err
