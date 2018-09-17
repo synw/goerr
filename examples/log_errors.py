@@ -1,4 +1,3 @@
-import pprint
 from datetime import datetime
 from goerr import Err
 
@@ -16,6 +15,7 @@ def run_func(funcname):
 
 class Foo(Err):
     log_errs = True
+    trace_errs = True
 
     def func1(self):
         run_func("func1")
@@ -30,14 +30,12 @@ class Foo(Err):
         try:
             now = datetime.later()
         except Exception as e:
-            error = self.err(e, "Now is not later!")
-            print("Dictionnary with the error elements:")
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(self.errdict(error))
+            self.err(e, "Now is not later!")
         run_func("func2")
 
 
 foo = Foo()
 foo.func1()
 foo.func2()
+foo.trace()
 print("Run finished: check errors.log")

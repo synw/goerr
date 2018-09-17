@@ -1,7 +1,8 @@
-from goerr import Err
+from goerr import err
 
-err = Err()
 try:
     import foobar
 except ImportError as e:
-    err.panic(e)
+    err(e)
+    
+print("This will not print")

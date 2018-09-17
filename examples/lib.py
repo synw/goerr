@@ -31,9 +31,9 @@ class Foo(Err):
         run_func("func2")
         try:
             df = self.func1()
-            df2 = df.copy()
+            data = df.wrong_field
         except Exception as e:
-            self.err(e, "Can not copy dataframe")
+            self.err(e, "Can not select data")
         run_func("func2")
 
     def func3(self):
