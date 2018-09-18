@@ -21,6 +21,7 @@ class Err():
     log_errs = False  # type: bool
     log_format = "csv"  # type: str
     log_path = "errors.log"  # type: str
+    test_errs_mode = False  # type: bool
 
     def __init__(self, function: str=None, date: datetime=datetime.now(),
                  msg: str=None, errtype: str=None, errclass: str=None,
@@ -77,7 +78,8 @@ class Err():
         """
         error = self._err(*args)
         if self.trace_errs is False:
-            sys.exit(1)  # pragma: no cover
+            if self.test_errs_mode is False:  # pragma: no cover
+                sys.exit(1)  # pragma: no cover
         return error
     
     def panic(self, *args):
@@ -87,7 +89,8 @@ class Err():
         self._err(*args)
         if self.trace_errs is True:
             self.trace()
-        sys.exit(1)  # pragma: no cover
+        if self.test_errs_mode is False:  # pragma: no cover
+            sys.exit(1)  # pragma: no cover
 
     def _err(self, *args):
         """
