@@ -1,91 +1,78 @@
 import unittest
-#import pandas as pd
+# import pandas as pd
 from datetime import datetime
 from goerr import Err
 from goerr.messages import Msgs
 from goerr.colors import colors
 from goerr.testing import assert_err
 
-
-tr = Err()
-tr.trace_errs = True
+errs = Err()
+errs.trace_errs = True
+errs.test_errs_mode = True
 
 
 class ErrTest(unittest.TestCase):
 
     def test_repr(self):
-        tr.errors = []
-        tr.err("An error message")
+        errs.errors = []
+        errs.err("An error message")
         msg = "<goerror.Err object: 1 error>"
-        self.assertEqual(tr.__repr__(), msg)
-        tr.err("An error message")
+        self.assertEqual(errs.__repr__(), msg)
+        errs.err("An error message")
         msg = "<goerror.Err object: 2 errors>"
-        self.assertEqual(tr.__repr__(), msg)
+        self.assertEqual(errs.__repr__(), msg)
 
     def test_str(self):
-        tr.errors = []
-        tr.err("An error message")
+        errs.errors = []
+        errs.err("An error message")
         msg = "[\033[91merror\033[0m] from \033[1mtest_str\033[0m\n" \
             "An error message"
-        self.assertEqual(tr.__str__(), msg)
-
-    def test_error(self):
-        tr.errors = []
-
-        def run():
-            try:
-                "a" > 1
-            except Exception as e:
-                tr.err(e)
-
-        assert_err("TypeError", run)
-        tr.err("Another error")
-        self.assertEqual(len(tr.errors), 2)
-        tr.trace()
-        tr.err("Error")
-        self.assertEqual(len(tr.errors), 1)
+        self.assertEqual(errs.__str__(), msg)
 
     def test_err_msg(self):
-        tr.errors = []
-        tr.errs_traceback = True
+        errs.errors = []
+        errs.errs_traceback = True
         try:
             "a" > 1
         except Exception as e:
-            tr.err(e)
-        tr.err("Another error")
-        self.assertEqual(len(tr.errors), 2)
-        tr.errs_traceback = False
+            errs.err(e)
+        errs.err("Another error")
+        self.assertEqual(len(errs.errors), 2)
+        errs.errs_traceback = False
 
     def test_caller(self):
+        errs.errors = []
+
         class Foo():
+
             def func1(self):
                 try:
                     1 > "bar"
                 except Exception as e:
-                    tr.err(e)
+                    errs.err(e)
 
             def func2(self):
                 self.func1()
                 try:
                     now = datetime.later()
                 except Exception as e:
-                    tr.err(e, "Now is not later!")
+                    errs.err(e, "Now is not later!")
 
         foo = Foo()
         foo.func2()
-        self.assertEqual(tr.errors[0].caller, "func2")
-        self.assertEqual(tr.errors[0].function, "func1")
-        self.assertEqual(tr.errors[1].caller, "test_caller")
-        self.assertEqual(tr.errors[1].function, "func2")
+        self.assertEqual(errs.errors[0].caller, "func2")
+        self.assertEqual(errs.errors[0].function, "func1")
+        self.assertEqual(errs.errors[1].caller, "test_caller")
+        self.assertEqual(errs.errors[1].function, "func2")
 
-        caller = tr._get_caller(["one", "two"], "one")
+        caller = errs._get_caller(["one", "two"], "one")
         self.assertEqual(caller, "two")
 
     def test_get_args(self):
         try:
             "a" > 1
         except Exception as e:
-            ex, msg = tr._get_args(e, "msg")
+            ex, msg = errs._get_args(e, "msg")
             self.assertEqual(ex, e)
             self.assertEqual(msg, "msg")
 
@@ -132,81 +119,74 @@ class ErrTest(unittest.TestCase):
         self.assertEqual(foo.errors[0].caller, "func1")"""
 
     def test_no_traceback(self):
-        tr.errors = []
-        tr.errs_traceback = False
+        errs.errors = []
+        errs.errs_traceback = False
         try:
             "a" > 1
         except Exception as e:
-            tr.err(e)
-        tr.err("Another error")
-        tr.trace()
-        tr.errs_traceback = True
+            errs.err(e)
+        errs.err("Another error")
+        errs.trace()
+        errs.errs_traceback = True
 
     def test_no_trace(self):
-        tr.errors = []
-        tr.trace_errs = False
+        errs.errors = []
+        errs.trace_errs = False
         try:
             "a" > 1
         except Exception as e:
-            tr.err(e)
-        tr.err("Another error")
-        self.assertEqual(len(tr.errors), 0)
-        tr.trace_errs = True
+            errs.err(e)
+        errs.err("Another error")
+        self.assertEqual(len(errs.errors), 0)
+        errs.trace_errs = True
 
     def test_trace(self):
-        tr.errors = []
-        tr.trace_errs = True
+        errs.errors = []
+        errs.trace_errs = True
         try:
             "a" > 1
         except Exception as e:
-            tr.err(e)
-        tr.err("Another error")
-        self.assertEqual(len(tr.errors), 2)
+            errs.err(e)
+        errs.err("Another error")
+        self.assertEqual(len(errs.errors), 2)
 
-    def test_fatal(self):
+    def test_panic(self):
         try:
             "a" > 1
         except Exception as e:
-            tr.fatal(e, test=True)
+            errs.panic(e)
 
     def test_warning(self):
-        tr.errors = []
+        errs.errors = []
         msg = "A warning message"
-        tr.warning(msg)
-        self.assertEqual(tr.errors[0].msg, msg)
-        tr.warning(msg)
-        self.assertEqual(len(tr.errors), 2)
+        errs.warning(msg)
+        self.assertEqual(errs.errors[0].msg, msg)
+        errs.warning(msg)
+        self.assertEqual(len(errs.errors), 2)
 
     def test_info(self):
-        tr.errors = []
+        errs.errors = []
         msg = "An info message"
-        tr.info(msg)
-        self.assertEqual(tr.errors[0].msg, msg)
-        tr.info(msg)
-        self.assertEqual(len(tr.errors), 2)
+        errs.info(msg)
+        self.assertEqual(errs.errors[0].msg, msg)
+        errs.info(msg)
+        self.assertEqual(len(errs.errors), 2)
 
     def test_debug(self):
-        tr.errors = []
+        errs.errors = []
         msg = "A debug message"
-        tr.debug(msg)
-        self.assertEqual(tr.errors[0].msg, msg)
-        tr.debug(msg)
-        self.assertEqual(len(tr.errors), 2)
-
-    def test_single_error(self):
-        tr.errors = []
-        msg = "A message"
-        tr.error(msg)
-        self.assertEqual(len(tr.errors), 0)
-        tr.error()
+        errs.debug(msg)
+        self.assertEqual(errs.errors[0].msg, msg)
+        errs.debug(msg)
+        self.assertEqual(len(errs.errors), 2)
 
     def test_via(self):
-        tr.errors = []
+        errs.errors = []
         msg = "A message"
-        tr.err(msg)
-        tr.err()
-        self.assertEqual(len(tr.errors), 2)
-        tr.trace()
+        errs.err(msg)
+        errs.err()
+        self.assertEqual(len(errs.errors), 2)
+        errs.trace()
 
     def test_colors(self):
         color = '\033[94m'
