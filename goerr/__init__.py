@@ -130,11 +130,11 @@ class Err():
         if self.trace_errs is True:
             self.errors.append(error)
             
-    def errdict(self, error: "Err"):
+    def errdict(self):
         """
         Returns a dictionnary with the error elements
         """
-        return self._errmsg(error, msgformat="dict")
+        return self._errmsg(self, msgformat="dict")
 
     def debug(self, *args):
         """
