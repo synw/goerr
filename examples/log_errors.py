@@ -2,7 +2,7 @@ from datetime import datetime
 from goerr import Err
 
 """
-Print basic errors
+Print errors and log them
 """
 
 
