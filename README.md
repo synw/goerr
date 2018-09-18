@@ -6,7 +6,8 @@ Go style explicit error handling in Python. Features:
 
   - **Pretty print** of error details  
   - **Trace** errors across the call stack  
-  - **Log** errors
+  - **Log** errors  
+  - **Test** errors
 
    ```bash
    pip install goerr
