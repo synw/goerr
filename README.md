@@ -2,13 +2,62 @@
 
 [![Build Status](https://travis-ci.org/synw/goerr.svg?branch=master)](https://travis-ci.org/synw/goerr) [![Coverage Status](https://coveralls.io/repos/github/synw/goerr/badge.svg?branch=master)](https://coveralls.io/github/synw/goerr?branch=master)
 
-Go style explicit error handling in Python. Propagates errors up the call stack in the same style as Go.
+Go style explicit error handling in Python. Features:
+
+  - **Pretty print** of error details  
+  - **Trace** errors across the call stack  
+  - **Log** errors
 
    ```bash
    pip install goerr
    ```
 
-## Quick example
+## API
+
+Class **`Err`**
+
+### Properties:
+
+#### Trace
+
+**`trace_errs`**: activate the errors trace: `True` or `False`. Default is `False`. If not activated the program
+will exit on the first error encountered (same behavior as exceptions). If activated the program will print the 
+error and continue. A complete errors trace can be printed when needed  
+
+#### Logging
+
+**`log_errs`**: log errors: `True` or `False`. Default is `False`  
+**`log_path`**: path of the file where to log. Default is `"errors.log"`  
+**`log_format`**: csv or text. Default is `"csv"`. Note: the tracebacks are not recorded if the format is csv.
+
+### Methods:
+
+**`err`**: creates a new error, print it and store it in the trace if the option is activated. Exit the program
+if the trace is not activated. Parameters: 
+
+- `ex`: an exception (optional)
+- `msg`: the message string (optional)
+Either a message string or an exception has to be provided as argument for the error to be
+printed. If no argument is provided it will just record the function name to keep a trace of
+the call stack
+
+**`warning`**: prints a warning message
+
+**`info`**: prints an info message
+
+**`debug`**: prints a debug message
+
+**`trace`**: prints the errors trace and reset it
+
+**`panic`**: force program exit after an error even if the errors trace is activated
+
+**`errdict`**: returns a dictionnary with the error details 
+
+Check the examples directory for code
+
+## Example
+
+Trace errors across the call stack:
 
    ```python
 from datetime import datetime
@@ -53,44 +102,6 @@ foo.trace()
 Output:
 
 ![Stack trace screenshot](docs/img/output.png)
-
-## API
-
-### Methods:
-
-**`err`**: creates a new error, print it and store it in the trace: parameters: 
-
-- `ex`: an exception (optional)
-- `msg`: the message string (optional)
-Either a message string or an exception has to be provided as argument for the error to be
-printed. If no argument is provided it will just record the function name to keep trace of
-the call stack
-
-**`fatal`**: check if error exists, run `trace()` if it does and raise an exception
-
-**`warning`**: prints a warning message and add it to the trace
-
-**`info`**: prints an info message and add it to the trace
-
-**`debug`**: prints a debug message and add it to the trace
-
-**`trace`**: prints the errors trace and reset it
-
-**error**: creates a single error and print it without recording it in the trace. This is only useful when the `trace_errs` option is activated
-
-- `ex`: an exception (optional)
-- `msg`: the message string (optional)
-Either a message string or an exception has to be provided as argument
-
-### Properties:
-
-**`errors`**: list of the errors
-
-**`trace_errs`**: activate the errors trace: True or False. Default is False.
-
-**`errs_traceback`**: print the stack trace when displaying the errors. Default is True
-
-Check the examples directory for code
 
 ## Testing errors in programs
 
