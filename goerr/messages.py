@@ -1,7 +1,7 @@
 from goerr.colors import colors
 
 
-class Msgs():
+class Msg():
     """
     Class to handle the messages
     """

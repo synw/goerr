@@ -15,23 +15,9 @@ Go style explicit error handling in Python. Features:
 
 ## API
 
-Class **`Err`**
+### Class **`Err`**
 
-### Properties:
-
-#### Trace
-
-**`trace_errs`**: activate the errors trace: `True` or `False`. Default is `False`. If not activated the program
-will exit on the first error encountered (same behavior as exceptions). If activated the program will print the 
-error and continue. A complete errors trace can be printed when needed  
-
-#### Logging
-
-**`log_errs`**: log errors: `True` or `False`. Default is `False`  
-**`log_path`**: path of the file where to log. Default is `"errors.log"`  
-**`log_format`**: csv or text. Default is `"csv"`. Note: the tracebacks are not recorded if the format is csv.
-
-### Methods:
+#### Methods:
 
 **`err`**: creates a new error, print it and store it in the trace if the option is activated. Exit the program
 if the trace is not activated. Parameters: 
@@ -48,56 +34,68 @@ the call stack
 
 **`debug`**: prints a debug message
 
-**`trace`**: prints the errors trace and reset it
-
 **`panic`**: force program exit after an error even if the errors trace is activated
 
-**`errdict`**: returns a dictionnary with the error details 
+**`to_dict`**: returns a dictionnary with the error details 
 
-Check the examples directory for code
+### Class **`Log`**
+
+Same as  `Err` but log errors
+
+#### Properties
+
+**`log_path`**: path of the file where to log. Default is `"errors.log"`  
+**`log_format`**: csv or text. Default is `"csv"`. 
+Note: the tracebacks are not recorded if the format is csv.
+
+### Class **`Trace`**
+
+Same as `Err` but trace errors
+
+#### Properties
+
+**`trace`**: prints the errors trace and reset it
+**`via`**: same as `err` with an empty error: to record the call stack. See example
 
 ## Example
+
+Check the [examples](./examples) directory for code
 
 Trace errors across the call stack:
 
    ```python
-from datetime import datetime
-from goerr import Err
+import time
+from goerr import Trace
+
+err = Trace()
 
 
-def run_func(funcname):
-    i = 3
-    while i > 0:
-        print(funcname + "running")
-        i -= 1
+def func1():
+    print("Func 1 running")
+    time.sleep(0.5)
+    try:
+        'x' > 1
+    except Exception as e:
+        err.new("Errmsg frun func1", e)
+    print("Func 1 finished")
 
+    
+def func2():
+    func1()
+    time.sleep(0.5)
+    err.via("Errmsg frun func2")
+    print("Func 2 running")
 
-class Foo(Err):
-	# activate the errors trace
-	trace_errs = True
+        
+def func3():
+    func2()
+    time.sleep(0.5)
+    err.via()
+    print("Func 3 running")
 
-    def func1(self):
-        run_func("func1")
-        try:
-            1 > "bar"
-        except Exception as e:
-            self.err(e)
-        run_func("func1")
-
-    def func2(self):
-        run_func("func2")
-        try:
-            now = datetime.later()
-        except Exception as e:
-            self.err(e, "Now is not later!")
-        run_func("func2")
-
-
-foo = Foo()
-foo.func1()
-foo.func2()
-print("Run finished, checking:")
-foo.trace()
+        
+func3()
+err.trace()
    ```
 
 Output:

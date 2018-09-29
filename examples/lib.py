@@ -1,14 +1,18 @@
-from pandas import pandas as pd
-from goerr import Err
+import time
+import pandas as pd
+from goerr import Trace
+
+err = Trace()
 
 
 def run_func(funcname, i=3):
     while i > 0:
         print(funcname + " running")
         i -= 1
+    time.sleep(0.5)
 
 
-class Foo(Err):
+class Foo(Trace):
     trace_errs = True
 
     def run(self):
@@ -19,10 +23,9 @@ class Foo(Err):
         df = None
         run_func("func1")
         try:
-            df = pd.DataFrame([[1, 2, 3]])
-            df.head("wrong")
+            df = pd.DataFrame("wrong")
         except Exception as e:
-            self.err(e)
+            err.new(e)
         run_func("func1")
         return df
 
@@ -31,9 +34,9 @@ class Foo(Err):
         run_func("func2")
         try:
             df = self.func1()
-            data = df.wrong_field
+            df2 = df.copy()
         except Exception as e:
-            self.err(e, "Can not select data")
+            err.new(e, "Can not copy dataframe")
         run_func("func2")
 
     def func3(self):
@@ -43,11 +46,11 @@ class Foo(Err):
         try:
             "a" > 1
         except Exception as e:
-            self.err(e)
+            err.new(e)
         run_func("func3")
 
 
 foo = Foo()
 foo.run()
 print("Run finished, checking:")
-foo.trace()
+err.trace()

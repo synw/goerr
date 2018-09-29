@@ -2,11 +2,11 @@ import unittest
 from io import StringIO
 from contextlib import redirect_stdout
 
-
 tc = unittest.TestCase()
 
 
 def assert_err(err_type, func, *args, **kwargs):
+    global tc
     f = StringIO()
     with redirect_stdout(f):
         func(*args, **kwargs)
