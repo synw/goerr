@@ -1,4 +1,6 @@
+# flake8: noqa: E501
 import unittest
+
 # import pandas as pd
 from datetime import datetime
 from goerr import Err, Trace
@@ -20,7 +22,6 @@ def newtr():
 
 
 class ErrTest(unittest.TestCase):
-
     def test_repr(self):
         err = newtr()
         err.new("An error message")
@@ -39,7 +40,7 @@ class ErrTest(unittest.TestCase):
     def test_err_msg(self):
         err = newtr()
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             err.new(e)
         err.new("Another error")
@@ -48,18 +49,17 @@ class ErrTest(unittest.TestCase):
     def test_caller(self):
         err = newtr()
 
-        class Foo():
-
+        class Foo:
             def func1(self):
                 try:
-                    1 > "bar"
+                    1 > "bar"  # type: ignore
                 except Exception as e:
                     err.new(e)
 
             def func2(self):
                 self.func1()
                 try:
-                    now = datetime.later()
+                    now = datetime.later()  # type: ignore
                 except Exception as e:
                     err.new(e, "Now is not later!")
 
@@ -76,7 +76,7 @@ class ErrTest(unittest.TestCase):
     def test_get_args(self):
         err = newerr()
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             ex, msg = err._get_args(e, "msg")
             self.assertEqual(ex, e)
@@ -128,7 +128,7 @@ class ErrTest(unittest.TestCase):
         err = newtr()
         err.errs_traceback = False
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             err.new(e)
         err.new("Another error")
@@ -138,7 +138,7 @@ class ErrTest(unittest.TestCase):
     def test_no_trace(self):
         err = newerr()
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             err.new(e)
         err.new("Another error")
@@ -147,7 +147,7 @@ class ErrTest(unittest.TestCase):
     def test_trace(self):
         err = newtr()
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             err.new(e)
         err.new("Another error")
@@ -156,7 +156,7 @@ class ErrTest(unittest.TestCase):
     def test_panic(self):
         err = newerr()
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             err.panic(e)
 
@@ -188,51 +188,53 @@ class ErrTest(unittest.TestCase):
         err.new(msg)
         err.via()
         self.assertEqual(len(err.errors), 2)
-        
+
     """def test_to_dict(self):
         err = newerr()
         try:
-            "a" > 1
+            "a" > 1  # type: ignore
         except Exception as e:
             error = err.new(e)
-            d = {'line': 195,
-                    'traceback': 'Traceback (most recent call last):\n  File "tests.py", line 195, in test_to_dict\n    "a" > 1\nTypeError: unorderable types: str() > int()\n', 'file': 'tests.py', 'msg': 'unorderable types: str() > int()',
-                    'code': '"a" > 1'
+            d = {
+                "line": 195,
+                "traceback": 'Traceback (most recent call last):\n  File "tests.py", line 195, in test_to_dict\n    "a" > 1\nTypeError: unorderable types: str() > int()\n',
+                "file": "tests.py",
+                "msg": "unorderable types: str() > int()",
+                "code": '"a" > 1',
             }
             d2 = error.to_dict()
             del d2["date"]
             self.assertEqual(d, d2)"""
 
     def test_colors(self):
-        color = '\033[94m'
+        color = "\033[94m"
         msg = "color"
         txt = colors.blue(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
-        color = '\033[92m'
+        color = "\033[92m"
         txt = colors.green(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
-        color = '\033[93m'
+        color = "\033[93m"
         txt = colors.yellow(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
-        color = '\033[95m'
+        color = "\033[95m"
         txt = colors.purple(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
-        color = '\033[1m'
+        color = "\033[1m"
         txt = colors.bold(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
-        color = '\033[4m'
+        color = "\033[4m"
         txt = colors.underline(msg)
         res = color + msg + "\033[0m"
         self.assertEqual(txt, res)
 
 
 class TestMsgs(unittest.TestCase):
-
     def setUp(self):
         self.msg = "A message"
 
@@ -279,5 +281,5 @@ class TestMsgs(unittest.TestCase):
         self.assertEqual(via, endmsg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

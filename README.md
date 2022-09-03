@@ -1,7 +1,5 @@
 # Goerr
 
-[![Build Status](https://travis-ci.org/synw/goerr.svg?branch=master)](https://travis-ci.org/synw/goerr) [![Coverage Status](https://coveralls.io/repos/github/synw/goerr/badge.svg?branch=master)](https://coveralls.io/github/synw/goerr?branch=master)
-
 Go style explicit error handling in Python. Features:
 
   - **Pretty print** of error details  
@@ -100,7 +98,7 @@ err.trace()
 
 Output:
 
-![Stack trace screenshot](docs/img/output.png)
+![Stack trace screenshot](doc/img/output.png)
 
 ## Testing errors in programs
 

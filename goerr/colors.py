@@ -1,37 +1,36 @@
-# -*- coding: utf-8 -*-
+from typing import List, Union
 
 
 class Colors:
-
-    def red(self, *msg):
-        color = '\033[91m'
+    def red(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[91m"
         return self._msg(color, *msg)
 
-    def blue(self, *msg):
-        color = '\033[94m'
+    def blue(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[94m"
         return self._msg(color, *msg)
 
-    def green(self, *msg):
-        color = '\033[92m'
+    def green(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[92m"
         return self._msg(color, *msg)
 
-    def yellow(self, *msg):
-        color = '\033[93m'
+    def yellow(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[93m"
         return self._msg(color, *msg)
 
-    def purple(self, *msg):
-        color = '\033[95m'
+    def purple(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[95m"
         return self._msg(color, *msg)
 
-    def bold(self, *msg):
-        color = '\033[1m'
+    def bold(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[1m"
         return self._msg(color, *msg)
 
-    def underline(self, *msg):
-        color = '\033[4m'
+    def underline(self, *msg: Union[str, List[str]]) -> str:
+        color = "\033[4m"
         return self._msg(color, *msg)
 
-    def _msg(self, color, *msg):
+    def _msg(self, color, *msg: Union[str, List[str]]) -> str:
         res = []
         for m in msg:
             res.append(str(m))

@@ -1,12 +1,13 @@
+from typing import Union
 from goerr.colors import colors
 
 
-class Msg():
+class Msg:
     """
     Class to handle the messages
     """
 
-    def fatal(self, i: int=None) -> str:
+    def fatal(self, i: Union[int, None] = None) -> str:
         """
         Returns a fatal error message
         """
@@ -15,7 +16,7 @@ class Msg():
             head = str(i) + " " + head
         return head
 
-    def error(self, i: int=None) -> str:
+    def error(self, i: Union[int, None] = None) -> str:
         """
         Returns an error message
         """
@@ -24,7 +25,7 @@ class Msg():
             head = str(i) + " " + head
         return head
 
-    def warning(self, i: int=None) -> str:
+    def warning(self, i: Union[int, None] = None) -> str:
         """
         Returns a warning message
         """
@@ -33,7 +34,7 @@ class Msg():
             head = str(i) + " " + head
         return head
 
-    def info(self, i: int=None) -> str:
+    def info(self, i: Union[int, None] = None) -> str:
         """
         Returns an info message
         """
@@ -42,7 +43,7 @@ class Msg():
             head = str(i) + " " + head
         return head
 
-    def via(self, i: int=None) -> str:
+    def via(self, i: Union[int, None] = None) -> str:
         """
         Returns an via message
         """
@@ -51,7 +52,7 @@ class Msg():
             head = str(i) + " " + head
         return head
 
-    def debug(self, i: int=None) -> str:
+    def debug(self, i: Union[int, None] = None) -> str:
         """
         Returns a debug message
         """
