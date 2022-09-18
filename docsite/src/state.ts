@@ -6,7 +6,7 @@ import { reactive } from "vue";
 
 const user = new User();
 const py = usePython();
-const api = useApi({ serverUrl: import.meta.env.MODE === 'development' ? '' : `/${libName}` });
+const api = useApi({ serverUrl: import.meta.env.MODE === 'development' ? '' : `/${libName.toLowerCase()}` });
 const state = reactive({
   apidocs: new Array<string>(),
   examples: new Array<string>(),
