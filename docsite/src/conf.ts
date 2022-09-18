@@ -6,8 +6,8 @@ const links: Array<{ href: string; name: string }> = [
 ];
 
 // python specific
-const pipPackages = [];
-const pyodidePackages = [];
+const pipPackages = ["goerr"];
+const pyodidePackages = ["pandas"];
 const examplesExtension = ".py";
 
 export { libName, links, pipPackages, examplesExtension, pyodidePackages }

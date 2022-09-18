@@ -10,6 +10,7 @@ Go style explicit error handling in Python. Features:
    ```bash
    pip install goerr
    ```
+[Documentation](https://synw.github.io/goerr/)
 
 ## API
 
