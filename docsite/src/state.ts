@@ -17,8 +17,12 @@ async function initPy() {
 }
 
 function fetchIndexes() {
-  api.get<Array<string>>("/apidoc/index.json").then((res) => state.apidocs = res);
-  api.get<Array<string>>("/examples/index.json").then(res => state.examples = res);
+  api.get<Array<string>>("/apidoc/index.json").then((res) => {
+    state.apidocs = typeof res == "string" ? JSON.parse(res) : res
+  });
+  api.get<Array<string>>("/examples/index.json").then(res =>
+    state.examples = typeof res == "string" ? JSON.parse(res) : res
+  );
 }
 
 function initState() {

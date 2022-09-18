@@ -1,0 +1,1 @@
+import{d as e,c as s,a,b as t,o,J as c}from"./index.d9ee565c.js";const _={class:"p-3"},n=t("div",{class:"pb-3 text-xl"},"Examples",-1),l=e({__name:"ExamplesView",setup(p){return(r,d)=>(o(),s("div",_,[n,a(c)]))}});export{l as default};
