@@ -61,12 +61,11 @@ Check the [examples](./examples) directory for code
 
 Trace errors across the call stack:
 
-   ```python
+```python
 import time
 from goerr import Trace
 
 err = Trace()
-
 
 def func1():
     print("Func 1 running")
@@ -77,24 +76,21 @@ def func1():
         err.new("Errmsg frun func1", e)
     print("Func 1 finished")
 
-    
 def func2():
     func1()
     time.sleep(0.5)
     err.via("Errmsg frun func2")
     print("Func 2 running")
-
-        
+       
 def func3():
     func2()
     time.sleep(0.5)
     err.via()
     print("Func 3 running")
-
         
 func3()
 err.trace()
-   ```
+```
 
 Output:
 
@@ -113,7 +109,7 @@ A helper function is available to test errors:
 
 Example:
 
-   ```python
+```python
 # the program
 from goerr import Err
    
@@ -133,7 +129,7 @@ from myprogram import Foo
 	  def test_myprogram(self):
           foo = Foo()
           assert_err("TypeError", foo.func1, 1, "bar")
-   ```
+```
 
 ## Why?
 
