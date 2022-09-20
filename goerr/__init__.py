@@ -3,43 +3,55 @@ import inspect
 import traceback
 import logging
 from datetime import datetime
-from typing import List
+from typing import Dict, List, Tuple, Union
 from .colors import colors
 from .messages import Msg
 
 
-class Err():
+class Err:
     """
     Errors manager
     """
-    errors = []  # type: List[Err]
-    trace_errs = False  # type: bool
-    errs_traceback = True  # type: bool
-    logger = None  # type: logging.Logger
-    log_errs = False  # type: bool
-    log_format = "csv"  # type: str
-    log_path = "errors.log"  # type: str
-    test_errs_mode = False  # type: bool
 
-    def __init__(self, function: str=None, date: datetime=datetime.now(),
-                 msg: str=None, errtype: str=None, errclass: str=None,
-                 line: int=None, file: str=None, code: str=None, tb: str=None,
-                 ex: Exception=None, caller: str=None, caller_msg: str=None):
+    errors: List["Err"] = []
+    trace_errs = False
+    errs_traceback = True
+    logger: logging.Logger
+    log_errs = False
+    log_format = "csv"
+    log_path = "errors.log"
+    test_errs_mode = False
+
+    def __init__(
+        self,
+        function: str = "",
+        date: datetime = datetime.now(),
+        msg: str = "",
+        errtype: str = "",
+        errclass: str = "",
+        line: int = 0,
+        file: str = "",
+        code: str = "",
+        tb: str = "",
+        ex: Union[Exception, None] = None,
+        caller: str = "",
+        caller_msg: str = "",
+    ):
         """
         Datastructure of an error
         """
-        self.date = date  # type: datetime.datetime
-        self.function = function  # type: str
-        self.msg = msg  # type: str
-        self.errtype = errtype  # type: str
-        self.errclass = errclass  # type: str
-        self.line = line  # type: int
-        self.file = file  # type: str
-        self.code = code  # type: str
-        self.tb = tb  # type: str
-        self.ex = ex  # type: Exception
-        self.caller = caller  # type: str
-        self.caller_msg = caller_msg  # type: str
+        self.date = date
+        self.function = function
+        self.msg = msg
+        self.errtype = errtype
+        self.errclass = errclass
+        self.line = line
+        self.file = file
+        self.code = code
+        self.tb = tb
+        self.ex = ex
+        self.caller = caller
+        self.caller_msg = caller_msg
         self.new = self.err
 
     def __repr__(self):
@@ -48,14 +60,14 @@ class Err():
 
     def __str__(self):
         return self.msg
-            
+
     def err(self, *args):
         """
         Creates an error
         """
         error = self._err("error", *args)
         return error
-    
+
     def panic(self, *args):
         """
         Creates a fatal error and exit
@@ -87,7 +99,7 @@ class Err():
         error = self._create_err("debug", *args)
         print(self._errmsg(error))
         return error
-            
+
     def _create_err(self, errclass: str, *args) -> "Err":
         """
         Create an error
@@ -95,8 +107,8 @@ class Err():
         error = self._new_err(errclass, *args)
         self._add(error)
         return error
-            
-    def _err(self, errclass: str="error", *args) -> "Err":
+
+    def _err(self, errclass: str = "error", *args) -> "Err":
         """
         Creates an error
         """
@@ -105,14 +117,17 @@ class Err():
             sep = " "
             if self.log_format == "csv":
                 sep = ","
-            msg = str(datetime.now()) + sep + \
-                self._errmsg(error, msgformat=self.log_format)
+            msg = (
+                str(datetime.now())
+                + sep
+                + self._errmsg(error, msgformat=self.log_format)
+            )
             self.logger.error(msg)
         print(self._errmsg(error))
         self._add(error)
         return error
-            
-    def _new_err(self, errclass: str, *args) -> 'Err':
+
+    def _new_err(self, errclass: str, *args) -> "Err":
         """
         Error constructor
         """
@@ -120,21 +135,20 @@ class Err():
         ex, msg = self._get_args(*args)
         # construct the error
         # handle exception
-        ftb = None  # type: str
-        function = None  # type: str
-        errtype = None  # type: str
-        file = None  # type: str
-        line = None  # type: int
-        code = None  # type: str
-        ex_msg = None  # type: str
-        caller = None  # type: str
-        caller_msg = None  # type: str
-
+        ftb: str = ""
+        function: Union[str, None] = None
+        errtype: str = ""
+        file: str = ""
+        line: int = 0
+        code: str = ""
+        ex_msg: str = ""
+        caller: Union[str, None] = None
+        caller_msg: Union[str, None] = None
         st = inspect.stack()
 
         if ex is not None:
             # get info from exception
-            errobj, ex_msg, tb = sys.exc_info()
+            errobj, ex_msg, tb = sys.exc_info()  # type: ignore
             tb = traceback.extract_tb(tb)
             file, line, function, code = tb[-1]
             # if called from an external lib
@@ -144,8 +158,7 @@ class Err():
                 call_stack = []
                 for c in st:
                     call_stack.append(c[3])
-                caller = self._get_caller(call_stack, function)
-
+                caller = self._get_caller(call_stack, function or "")
             internals = [
                 "err",
                 "_new_err",
@@ -153,7 +166,8 @@ class Err():
                 "warning",
                 "debug",
                 "info",
-                "<module>"]  
+                "<module>",
+            ]
             if caller == function or caller in internals:
                 caller = None
             # handle messages
@@ -163,7 +177,7 @@ class Err():
             else:
                 msg = str(ex_msg)
             ftb = traceback.format_exc()
-            errtype = errobj.__name__
+            errtype = errobj.__name__  # type: ignore
         if function is None:
             # for el in st:
             #   print(el)
@@ -173,20 +187,21 @@ class Err():
         # init error object
         date = datetime.now()
         error = Err(
-            function,
+            function or "",
             date,
-            msg,
-            errtype,
+            msg or "",
+            errtype or "",
             errclass,
             line,
             file,
             code,
             ftb,
             ex,
-            caller,
-            caller_msg)
+            caller or "",
+            caller_msg or "",
+        )
         return error
-    
+
     def _headline(self, error, i: int) -> str:
         """
         Format the error message's headline
@@ -207,9 +222,9 @@ class Err():
             msg = msgs.error(i)
         # function name
         if error.function is not None:
-            msg += " from " + colors.bold(error.function)
+            msg += " from " + colors.bold(error.function)  # type: ignore
         if error.caller is not None:
-            msg += " called from " + colors.bold(error.caller)
+            msg += " called from " + colors.bold(error.caller)  # type: ignore
         if error.caller_msg is not None:
             msg += "\n" + error.caller_msg
         if error.function is not None and error.msg is not None:
@@ -222,52 +237,61 @@ class Err():
             msg += error.msg
         return msg
 
-    def _errmsg(self, error: "Err", tb: bool=False, i: int=None,
-                msgformat: str="terminal") -> str:
+    def _errmsg_dict(
+        self, error: "Err", tb: bool = False
+    ) -> Dict[str, Union[datetime, str, int]]:
+        msg: Dict[str, Union[datetime, str, int]] = {"date": datetime.now()}
+        if error.ex is not None:
+            msg["msg"] = error.msg
+            msg["line"] = error.line
+            msg["code"] = error.code
+            msg["file"] = error.file
+            if self.errs_traceback is True or tb is True:
+                if error.tb is not None:
+                    msg["traceback"] = error.tb
+        return msg
+
+    def _errmsg(
+        self, error: "Err", tb: bool = False, i: int = 0, msgformat: str = "terminal"
+    ) -> str:
         """
         Get the error message
         """
         if msgformat == "terminal":
-            msg = self._headline(error, i)
+            msg_str = self._headline(error, i)
             if error.ex is not None:
-                msg += "\n" + "line " + colors.bold(str(error.line))
-                msg += ": " + colors.yellow(error.code)
-                msg += "\n" + str(error.file)
+                msg_str += "\n" + "line " + colors.bold(str(error.line))  # type: ignore
+                msg_str += ": " + colors.yellow(error.code)  # type: ignore
+                msg_str += "\n" + str(error.file)
                 if self.errs_traceback is True or tb is True:
                     if error.tb is not None:
-                        msg += "\n" + error.tb
+                        msg_str += "\n" + error.tb
+            return msg_str
         elif msgformat == "csv":
             sep = ","
-            msg = error.msg + sep
-            msg += str(error.line) + sep + error.code + sep
-            msg += str(error.file)
+            msg_str = error.msg + sep
+            msg_str += str(error.line) + sep + error.code + sep
+            msg_str += str(error.file)
+            return msg_str
         elif msgformat == "text":
             sep = ","
-            msg = error.msg
+            msg_str = error.msg
             if error.ex is not None:
-                msg += sep + str(error.line) + sep + error.code + sep
-                msg += str(error.file) + sep         
+                msg_str += sep + str(error.line) + sep + error.code + sep
+                msg_str += str(error.file) + sep
                 if self.errs_traceback is True or tb is True:
                     if error.tb is not None:
-                        msg += sep + error.tb
-        elif msgformat == "dict":
-            msg = {"date": datetime.now()}
-            if error.ex is not None:
-                msg["msg"] = error.msg
-                msg["line"] = error.line
-                msg["code"] = error.code
-                msg["file"] = error.file         
-                if self.errs_traceback is True or tb is True:
-                    if error.tb is not None:
-                        msg["traceback"] = error.tb
-        return msg
-    
+                        msg_str += sep + error.tb
+            return msg_str
+        else:
+            raise Exception(f"Unknown msg format {msgformat}")
+
     def to_dict(self):
         """
         Returns a dictionnary with the error elements
         """
         return self._errmsg(self, msgformat="dict")
-    
+
     def _print_errs(self):
         """
         Prints the errors trace with tracebacks
@@ -279,15 +303,15 @@ class Err():
             if self.errs_traceback is False:
                 print()
             i += 1
-            
+
     def _add(self, error: "Err"):
         """
         Adds an error to the trace if required
         """
         if self.trace_errs is True:
             self.errors.append(error)
-            
-    def _get_caller(self, callers: List[str], function: str) -> str:
+
+    def _get_caller(self, callers: List[str], function: str) -> Union[str, None]:
         """
         Get the caller function from the provided function
         """
@@ -298,7 +322,7 @@ class Err():
             if function == c:
                 is_next = True
 
-    def _get_args(self, *args) -> (Exception, str):
+    def _get_args(self, *args) -> Tuple[Union[Exception, None], Union[str, None]]:
         """
         Returns exception and message from the provided arguments
         """
@@ -310,16 +334,17 @@ class Err():
             elif isinstance(arg, Exception):
                 ex = arg
         return ex, msg
-    
+
 
 class Trace(Err):
     """
-    Tracess manager
+    Traces manager
     """
-    errors = []  # type: List[Err]
-    trace_errs = True  # type: bool
-    errs_traceback = False  # type: bool
-    
+
+    errors: List[Err] = []
+    trace_errs = True
+    errs_traceback = False
+
     def __repr__(self):
         s = "s"
         numerrs = len(self.errors)
@@ -327,7 +352,7 @@ class Trace(Err):
             s = ""
         msg = "<goerror.Trace object: " + str(numerrs) + " error" + s + ">"
         return msg
-    
+
     def trace(self):
         """
         Print the errors trace if there are some errors
@@ -337,8 +362,8 @@ class Trace(Err):
             print("========= Trace (" + str(numerrs) + ") =========")
         self._print_errs()
         self.errors = []
-        
-    def via(self, *args):
+
+    def via(self, *args) -> Union[Err, None]:
         """
         Creates an empty error to record in the stack
         trace
@@ -347,7 +372,7 @@ class Trace(Err):
         if len(self.errors) > 0:
             error = self._err("via", *args)
         return error
-    
+
     def panic(self, *args):
         """
         Creates a fatal error and exit
@@ -355,17 +380,18 @@ class Trace(Err):
         self._err(*args)
         self.trace()
         if self.test_errs_mode is False:  # pragma: no cover
-            sys.exit(1) 
+            sys.exit(1)
 
-    
+
 class Log(Err):
     """
     Errors manager with logging
     """
-    logger = None  # type: logging.Logger
-    log_errs = True  # type: bool
-    log_format = "csv"  # type: str
-    log_path = "errors.log"  # type: str
+
+    logger: logging.Logger
+    log_errs = True
+    log_format = "csv"
+    log_path = "errors.log"
 
     def __init__(self, log_path=None):
         """
@@ -378,4 +404,3 @@ class Log(Err):
         f_handler.setLevel(logging.ERROR)
         self.logger.addHandler(f_handler)
         super(Log, self).__init__()
-            

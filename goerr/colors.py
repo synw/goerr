@@ -30,7 +30,7 @@ class Colors:
         color = "\033[4m"
         return self._msg(color, *msg)
 
-    def _msg(self, color, *msg: Union[str, List[str]]) -> str:
+    def _msg(self, color: str, *msg: Union[str, List[str]]) -> str:
         res = []
         for m in msg:
             res.append(str(m))
